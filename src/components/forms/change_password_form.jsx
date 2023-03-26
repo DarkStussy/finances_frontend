@@ -1,26 +1,13 @@
-import {Button, Form} from "react-bootstrap";
-import UsernameInput from "../inputs/username";
 import PasswordInput from "../inputs/password";
-import {useState} from "react";
-import {apiUrl} from "../../App";
-import {useNavigate} from "react-router-dom";
-import {getInputChangeFunc} from "../../functions/input_change";
+import {Button, Form} from "react-bootstrap";
 import ConfirmPasswordInput from "../inputs/confirm_password";
+import {useState} from "react";
+import {errorInput, passwordPattern} from "./sign_up_form";
+import {getInputChangeFunc} from "../../functions/input_change";
+import {apiUrl} from "../../App";
+import BaseAlert from "../alert";
 
-export const usernamePattern = "\\w{3,32}";
-export const passwordPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,32}$";
-
-export const errorInput = (msg) => {
-    return (
-        <span id="reg_error" className="text-danger small">
-            {msg}
-        </span>
-    );
-}
-
-const SignUpForm = () => {
-    const username_text = <Form.Text className="text-white">
-        <p className="mt-2">Letters, numbers and _ only, 3 to 32 characters</p></Form.Text>
+const ChangePasswordForm = (props) => {
     const password_text = <Form.Text className="text-white">
         <p className="mt-2">1. At least one digit</p>
         <p>2. At least one lowercase character</p>
@@ -30,20 +17,15 @@ const SignUpForm = () => {
     </Form.Text>
 
     let [input, setInput] = useState({
-        username: "", password: "", confirm_password: ""
+        password: "", confirm_password: ""
     });
-    let [error, setError] = useState({username: "", password: "", confirm_password: "", detail: ""});
+    let [error, setError] = useState({password: "", confirm_password: "", alert: "", msg: ""});
 
     const validateInput = e => {
         let {name, value} = e.target;
         setError(prevState => {
             const stateObj = {...prevState, [name]: ""};
             switch (name) {
-                case "username":
-                    if (!value.match(usernamePattern) && value) {
-                        stateObj["username"] = "Username doesn't match pattern";
-                    }
-                    break;
                 case "password":
                     if (!value.match(passwordPattern) && value) {
                         stateObj["password"] = "Password doesn't match pattern";
@@ -53,7 +35,6 @@ const SignUpForm = () => {
                         stateObj["confirm_password"] = input.confirm_password ? "" : error.confirm_password;
                     }
                     break;
-
                 case "confirm_password":
                     if (input.password && value !== input.password && value) {
                         stateObj[name] = "Password and Confirm Password does not match.";
@@ -67,53 +48,59 @@ const SignUpForm = () => {
             return stateObj;
         });
     }
-    const navigate = useNavigate();
     const onSubmit = (e) => {
         e.preventDefault();
         const body = JSON.stringify(
             {
-                username: input.username,
                 password: input.password,
             }
         );
         const headers = new Headers({
             "accept": "application/json",
             "Content-Type": "application/json",
+            "Authorization": props.accessToken
         });
         const requestOptions = {
-            method: 'POST',
+            method: 'PUT',
             body: body,
             headers: headers
         };
-        fetch(apiUrl + "/user/signup", requestOptions)
+        fetch(apiUrl + "/user/setpassword", requestOptions)
             .then((response) => response.json())
             .then((data) => {
                 const detail = data.detail;
                 if (detail === 'OK') {
-                    navigate({pathname: '/login'})
+                    setError({...error, alert: "success", msg: "You have successfully changed your password!"})
                 } else {
-                    setError({...error, detail: detail});
+                    setError({...error, alert: "danger", msg: "An error has occurred"});
                 }
+                setShow(true);
+                setInput({password: "", confirm_password: ""});
             })
             .catch(error => console.log('error', error));
     }
 
+    let [show, setShow] = useState(false);
+    const getAlert = () => {
+        return <BaseAlert show={show} setShow={setShow} className="mb-3" type={error.alert}
+                          alert_text={error.msg}/>;
+    }
+
     const onInputChange = getInputChangeFunc(setInput, validateInput);
     return (
-        <Form onSubmit={onSubmit} id="signup_form" className="p-5 m-auto w-50">
-            {errorInput(error.username)}
-            <UsernameInput onChange={onInputChange} username_text={username_text}/>
-            {errorInput(error.password)}
-            <PasswordInput onChange={onInputChange} password_text={password_text}/>
-            {errorInput(error.confirm_password)}
-            <ConfirmPasswordInput onChange={onInputChange}/>
-            {errorInput(error.detail)}
-            <Button className="bg-gradient w-100" variant="primary" type="submit"
-                    disabled={!!(error.username || error.password || error.confirm_password)}>
-                Sign up
-            </Button>
-        </Form>
+        <>
+            {getAlert()}
+            <Form onSubmit={onSubmit} className="p-5 m-auto w-50">
+                {errorInput(error.password)}
+                <PasswordInput value={input.password} onChange={onInputChange} password_text={password_text}/>
+                {errorInput(error.confirm_password)}
+                <ConfirmPasswordInput value={input.confirm_password} onChange={onInputChange}/>
+                <Button className="bg-gradient w-100" variant="primary" type="submit">
+                    Change password
+                </Button>
+            </Form>
+        </>
     );
 }
 
-export default SignUpForm;
+export default ChangePasswordForm;

@@ -7,6 +7,7 @@ import Main from "./pages/main";
 import SignIn from "./pages/sign_in";
 import SignUp from "./pages/sign_up";
 import {useAccessToken} from "./functions/user";
+import ChangePassword from "./pages/change_password";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -21,6 +22,7 @@ const App = () => {
                     <Route path={'/'} element={<Main/>}/>
                     <Route path={'/login'} element={<SignIn setAccessToken={setAccessToken}/>}/>
                     <Route path={'/signup'} element={<SignUp/>}/>
+                    <Route path={'/changePassword'} element={<ChangePassword accessToken={accessToken}/>}/>
                 </Routes>
             </main>
             <Footer/>

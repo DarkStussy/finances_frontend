@@ -2,7 +2,6 @@ import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {LinkContainer} from 'react-router-bootstrap';
 import {getUser} from "../functions/user";
 import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 
@@ -13,7 +12,6 @@ const Header = (props) => {
     useEffect(() => {
         const getUsername = async () => {
             const user = await getUser(props.accessToken);
-            console.log(user);
             setUser({username: user['username']});
         };
         getUsername().catch(console.error);
@@ -35,9 +33,10 @@ const Header = (props) => {
                     onMouseEnter={() => setShowDropdown(true)}
                     onMouseLeave={() => setShowDropdown(false)}>
                     <NavDropdown.Header>Username: {user.username}</NavDropdown.Header>
-                    <NavDropdown.Item><Link className="text-white text-decoration-none"
-                                            to="/">Settings</Link></NavDropdown.Item>
-                    <NavDropdown.Item onClick={logout} href="">Logout</NavDropdown.Item>
+                    <LinkContainer to="/changePassword">
+                        <NavDropdown.Item>Change password</NavDropdown.Item>
+                    </LinkContainer>
+                    <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                 </NavDropdown>
             );
         } else {

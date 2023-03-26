@@ -1,12 +1,10 @@
 import {Alert} from "react-bootstrap";
-import {useState} from "react";
 
 
-const AlertSuccess = (props) => {
-    const [show, setShow] = useState(true);
-    if (show) {
+const BaseAlert = (props) => {
+    if (props.show) {
         return (
-            <Alert className="w-75 m-auto" variant={props.type} onClose={() => setShow(false)} dismissible>
+            <Alert className="w-75 m-auto" variant={props.type} onClose={() => props.setShow(false)} dismissible>
                 {props.alert_text}
             </Alert>
         );
@@ -14,4 +12,4 @@ const AlertSuccess = (props) => {
     return <></>
 }
 
-export default AlertSuccess;
+export default BaseAlert;
