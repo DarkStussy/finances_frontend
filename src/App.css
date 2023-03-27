@@ -22,7 +22,7 @@
     display: block;
 }
 
-.user-options .dropdown-toggle::before {
+.nav-item .dropdown-toggle::before, .dropdown-toggle::after {
     display: none;
 }
 
