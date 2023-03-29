@@ -1,3 +1,8 @@
+:root {
+    --amount-positive: #3b70db;
+    --amount-negative: #ef4f4f;
+}
+
 .App {
     background: #24282c;
     color: white;
@@ -42,4 +47,24 @@
 
 .form-control::placeholder {
     color: lightgrey;
+}
+
+.table-dark {
+    --bs-table-bg: #2a2e33;
+}
+.table-dark thead, tfoot {
+    --bs-table-bg: #24282c;
+}
+
+.modal-content {
+    background: var(--bs-dark);
+    color: whitesmoke;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
 }

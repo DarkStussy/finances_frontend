@@ -12,7 +12,7 @@ export const passwordPattern = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@
 
 export const errorInput = (msg) => {
     return (
-        <span id="reg_error" className="text-danger small">
+        <span id="errorInput" className="text-danger small">
             {msg}
         </span>
     );

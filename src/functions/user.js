@@ -20,7 +20,10 @@ export const useAccessToken = () => {
     };
     const [token, setToken] = useState(getToken());
     const saveToken = accessToken => {
-        localStorage.setItem('access_token', accessToken);
+        if(!accessToken)
+            localStorage.removeItem("access_token");
+        else
+            localStorage.setItem('access_token', accessToken);
         setToken(accessToken);
     };
 
