@@ -71,3 +71,7 @@
 .modal-footer {
     border-top: none;
 }
+
+.table {
+    table-layout: fixed;
+}

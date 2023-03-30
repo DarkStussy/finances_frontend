@@ -67,8 +67,8 @@ const AssetsComponent = (props) => {
                 e.preventDefault();
                 navigate('/asset', {state: {assetID}})
             }} key={assetID}>
-                <td colSpan={3}>{asset["title"]}</td>
-                <td style={{color: amountColor}}>{asset["amount"]} {currency_code}</td>
+                <td colSpan={2}>{asset["title"]}</td>
+                <td colSpan={2} style={{color: amountColor}}>{asset["amount"]} {currency_code}</td>
             </tr>
         );
     })
@@ -85,8 +85,8 @@ const AssetsComponent = (props) => {
                 </tbody>
                 <tfoot>
                 <tr id="assetsFooter">
-                    <td colSpan={3} className="fw-bold text-decoration-underline">Total</td>
-                    <td style={{color: total.color}}>{total.amount} {props.baseCurrency.currentCode}</td>
+                    <td colSpan={2} className="fw-bold">Total</td>
+                    <td colSpan={2} style={{color: total.color}}>{total.amount} {props.baseCurrency.currentCode}</td>
                 </tr>
                 </tfoot>
             </Table>

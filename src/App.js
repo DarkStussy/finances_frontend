@@ -48,7 +48,7 @@ const App = () => {
                     <Route path={'/changePassword'} element={<ChangePassword accessToken={accessToken}/>}/>
                     <Route path={'/assets'} element={<Assets accessToken={accessToken} baseCurrency={baseCurrency}
                                                              setBaseCurrencyState={setBaseCurrencyState}/>}/>
-                    <Route path={'/asset'} element={<Asset/>}/>
+                    <Route path={'/asset'} element={<Asset accessToken={accessToken}/>}/>
                 </Routes>
             </main>
             <Footer/>
