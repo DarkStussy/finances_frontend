@@ -55,6 +55,9 @@
 .table-dark thead, tfoot {
     --bs-table-bg: #24282c;
 }
+#assetsFooter {
+    border: hidden;
+}
 
 .modal-content {
     background: var(--bs-dark);

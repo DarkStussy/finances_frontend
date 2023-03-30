@@ -77,15 +77,15 @@ const AssetsComponent = (props) => {
             <Table className="text-center" hover variant="dark">
                 <thead>
                 <tr>
-                    <th className="h4" colSpan={4}>Assets</th>
+                    <th className="h4 fw-bold" colSpan={4}>Assets</th>
                 </tr>
                 </thead>
                 <tbody>
                 {assetsRows}
                 </tbody>
                 <tfoot>
-                <tr>
-                    <td colSpan={3}>Total</td>
+                <tr id="assetsFooter">
+                    <td colSpan={3} className="fw-bold text-decoration-underline">Total</td>
                     <td style={{color: total.color}}>{total.amount} {props.baseCurrency.currentCode}</td>
                 </tr>
                 </tfoot>
