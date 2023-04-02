@@ -3,7 +3,7 @@ import Select from "react-select";
 
 const AssetForm = ({onSubmit, onInputChange, onCurrencySelectChange, currenciesOptions, ...props}) => {
     return (
-        <Form onSubmit={onSubmit} className="p-5 m-auto">
+        <Form onSubmit={onSubmit} className="p-5 m-auto form">
             <Form.Group className="mb-3">
                 <Form.Control onChange={onInputChange}
                               type="text" name="assetTitle"

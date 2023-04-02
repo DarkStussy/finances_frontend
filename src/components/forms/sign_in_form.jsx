@@ -35,7 +35,7 @@ const SignInForm = (props) => {
             });
     }
     return (
-        <Form onSubmit={onSubmit} className="p-5 m-auto">
+        <Form onSubmit={onSubmit} className="p-5 m-auto form">
             <UsernameInput onChange={onInputChange}/>
             <PasswordInput onChange={onInputChange}/>
             <span className="text-danger small">

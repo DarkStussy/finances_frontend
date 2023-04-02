@@ -90,7 +90,7 @@ const ChangePasswordForm = (props) => {
     return (
         <>
             {getAlert()}
-            <Form onSubmit={onSubmit} className="p-5 m-auto w-50">
+            <Form onSubmit={onSubmit} className="p-5 m-auto form">
                 {errorInput(error.password)}
                 <PasswordInput value={input.password} onChange={onInputChange} password_text={password_text}/>
                 {errorInput(error.confirm_password)}
