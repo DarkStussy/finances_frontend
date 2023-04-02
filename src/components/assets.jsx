@@ -1,33 +1,10 @@
 import {Container, Table} from "react-bootstrap";
-import {apiUrl} from "../App";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
+import {getAssets, getTotalAssets} from "../functions/asset";
 
-const getAssets = async (accessToken) => {
-    const headers = new Headers({
-        accept: "application/json",
-        Authorization: accessToken
-    });
-    const requestParams = {
-        method: "GET",
-        headers: headers
-    }
-    const response = await fetch(apiUrl + "/asset/all", requestParams);
-    return await response.json();
-}
-
-const getTotalAssets = async (accessToken) => {
-    const headers = new Headers({
-        accept: "application/json",
-        Authorization: accessToken
-    });
-    const requestParams = {
-        method: "GET",
-        headers: headers
-    }
-    const response = await fetch(apiUrl + "/asset/totalPrices", requestParams);
-    return await response.json();
-}
 
 const AssetsComponent = (props) => {
     let [assets, setAssets] = useState([]);
@@ -41,7 +18,7 @@ const AssetsComponent = (props) => {
             const total = await getTotalAssets(props.accessToken);
             if (!total.detail) {
                 const totalAmount = total["total"];
-                const totalColor = totalAmount > 0 ? "var(--amount-positive)" : "var(--amount-negative)";
+                const totalColor = totalAmount >= 0 ? "var(--amount-positive)" : "var(--amount-negative)";
                 setTotal({amount: totalAmount, color: totalColor});
             }
         }
@@ -61,11 +38,11 @@ const AssetsComponent = (props) => {
         const currency_code = asset["currency"] ? asset["currency"]["code"] : "USD";
         const assetID = asset["id"];
         const amount = asset["amount"];
-        const amountColor = amount > 0 ? "var(--amount-positive)" : "var(--amount-negative)";
+        const amountColor = amount >= 0 ? "var(--amount-positive)" : "var(--amount-negative)";
         return (
             <tr onClick={(e) => {
                 e.preventDefault();
-                navigate('/asset', {state: {assetID}})
+                navigate('/asset', {state: {assetID}});
             }} key={assetID}>
                 <td colSpan={2}>{asset["title"]}</td>
                 <td colSpan={2} style={{color: amountColor}}>{asset["amount"]} {currency_code}</td>
@@ -74,12 +51,16 @@ const AssetsComponent = (props) => {
     })
     return (
         <Container>
-            <Table className="text-center" hover variant="dark">
-                <thead>
-                <tr>
-                    <th className="h4 fw-bold" colSpan={4}>Assets</th>
-                </tr>
-                </thead>
+            <div className="d-flex align-items-center justify-content-center">
+                <h2 className="p-4 text-center">Assets</h2>
+                <FontAwesomeIcon
+                    style={{cursor: "pointer"}}
+                    className="mb-1"
+                    onClick={() => navigate('/addAsset')}
+                    icon={faPlus}
+                    size="xl"/>
+            </div>
+            <Table className="text-center mt-3" hover variant="dark">
                 <tbody>
                 {assetsRows}
                 </tbody>

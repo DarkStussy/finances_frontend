@@ -12,6 +12,8 @@ import Asset from "./pages/asset";
 import Assets from "./pages/assets";
 import {useEffect, useState} from "react";
 import {getBaseCurrency} from "./functions/currency";
+import AddAsset from "./pages/add_asset";
+import ChangeAsset from "./pages/change_asset";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -49,6 +51,8 @@ const App = () => {
                     <Route path={'/assets'} element={<Assets accessToken={accessToken} baseCurrency={baseCurrency}
                                                              setBaseCurrencyState={setBaseCurrencyState}/>}/>
                     <Route path={'/asset'} element={<Asset accessToken={accessToken}/>}/>
+                    <Route path={'/addAsset'} element={<AddAsset accessToken={accessToken}/>}/>
+                    <Route path={'/changeAsset'} element={<ChangeAsset accessToken={accessToken}/>}/>
                 </Routes>
             </main>
             <Footer/>

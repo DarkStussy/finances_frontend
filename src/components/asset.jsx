@@ -2,6 +2,9 @@ import {Button, ButtonGroup, Container, Table} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {getTotalsByAsset, getTransactionsByAssetDaily} from "../functions/transaction";
 import {getAssetByID} from "../functions/asset";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router-dom";
 
 const AssetComponent = (props) => {
     let [assetTransactions, setAssetTransactions] = useState(
@@ -44,7 +47,7 @@ const AssetComponent = (props) => {
         const transactionRows = data["transactions"].map((transaction) => {
             if (currencyCode === null) {
                 const currency = transaction["asset"]["currency"];
-                if(currency === null) {
+                if (currency === null) {
                     currencyCode = "USD";
                 } else {
                     currencyCode = currency["code"];
@@ -89,9 +92,21 @@ const AssetComponent = (props) => {
             newDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
         setDate(new Date(newDate));
     }
+
+    const navigate = useNavigate();
     return (
-        <Container className="w-75">
-            <h2 className="p-4 text-center">{assetTransactions.asset.title}</h2>
+        <Container>
+            <div className="d-flex align-items-center justify-content-center">
+                <h2 className="p-4 text-center">{assetTransactions.asset.title}</h2>
+                <FontAwesomeIcon
+                    style={{cursor: "pointer"}}
+                    className="mb-2"
+                    onClick={() => navigate('/changeAsset', {state: {assetID: assetTransactions.asset.id}})}
+                    icon={faPenToSquare}
+                    size="lg"
+                />
+            </div>
+
             <Container className="mt-3 d-flex justify-content-between">
                 <ButtonGroup>
                     <Button onClick={() => backOrForwardOneDay("back")} className="bg-gradient"
@@ -109,7 +124,7 @@ const AssetComponent = (props) => {
                 </ButtonGroup>
             </Container>
             <Table responsive
-                   className="text-center mt-4 mb-4" hover variant="dark">
+                   className="text-center mt-4 mb-4" variant="dark">
                 <thead>
                 <tr>
                     <th>Income</th>

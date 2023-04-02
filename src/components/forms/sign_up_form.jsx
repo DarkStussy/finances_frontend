@@ -100,7 +100,7 @@ const SignUpForm = () => {
 
     const onInputChange = getInputChangeFunc(setInput, validateInput);
     return (
-        <Form onSubmit={onSubmit} id="signup_form" className="p-5 m-auto w-50">
+        <Form onSubmit={onSubmit} id="signup_form" className="p-5 m-auto">
             {errorInput(error.username)}
             <UsernameInput onChange={onInputChange} username_text={username_text}/>
             {errorInput(error.password)}

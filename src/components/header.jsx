@@ -6,8 +6,8 @@ import BaseNavDropdown from "./nav_dropdown";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getAllCurrencies, setBaseCurrency} from "../functions/currency";
-import {errorInput} from "./forms/sign_up_form";
 import {useNavigate} from "react-router-dom";
+import Select from "react-select";
 
 
 const Header = (props) => {
@@ -15,7 +15,7 @@ const Header = (props) => {
     let [currencies, setCurrencies] = useState([]);
     const [showDropdown, setShowDropdown] = useState({userInfo: false, fiat: false});
     useEffect(() => {
-        if(!props.accessToken)
+        if (!props.accessToken)
             return;
         const getUsername = async () => {
             const user = await getUser(props.accessToken);
@@ -91,16 +91,20 @@ const Header = (props) => {
     }
 
     let [showModal, setShowModal] = useState(false);
-    const handleCloseModal = () => setShowModal(false);
+    const handleCloseModal = () => {
+        setShowModal(false);
+        props.setBaseCurrencyState({currentCode: props.baseCurrency.currentCode, new: {}});
+    };
     const handleShow = () => setShowModal(true);
 
     const currenciesOptions = currencies.map((currency) => {
-        const currencyID = currency["id"];
         const currencyCode = currency["code"];
-        return <option value={currencyCode} key={currencyID}
-                       data-key={currencyID}>{currency["name"]} | {currencyCode}</option>
+        return {label: `${currency["name"]} | ${currencyCode}`, value: currency};
     });
-    let [error, setError] = useState("");
+
+    const onCurrencySelectChange = (option) => {
+        props.setBaseCurrencyState({currentCode: props.baseCurrency.currentCode, new: option.value});
+    }
     const submitBaseCurrency = (e) => {
         e.preventDefault();
 
@@ -109,28 +113,11 @@ const Header = (props) => {
             if (response.detail === "OK") {
                 setShowModal(false);
                 props.setBaseCurrencyState({currentCode: props.baseCurrency.new["code"], new: {}})
-            } else {
-                setError(response.detail);
             }
         }
-        if (Object.keys(props.baseCurrency.new).length === 0) {
-            setError("Currency not found");
-        } else {
-            fetchBaseCurrency().catch(console.error);
-        }
+        fetchBaseCurrency().catch(console.error);
 
     }
-    const ValidateAndSetBaseCurrency = (e) => {
-        const {value} = e.target;
-        const currency = currencies.find(item => item.code === value);
-        if (!currency) {
-            props.setBaseCurrencyState({...props.baseCurrency, new: {}});
-        } else {
-            props.setBaseCurrencyState({...props.baseCurrency, new: currency});
-            setError("");
-        }
-    }
-
     return (
         <>
             <header>
@@ -157,18 +144,13 @@ const Header = (props) => {
                 </Modal.Header>
                 <Form onSubmit={submitBaseCurrency}>
                     <Modal.Body>
-                        {errorInput(error)}
-                        <Form.Control autoComplete="off" onChange={ValidateAndSetBaseCurrency} name="newBaseCurrency"
-                                      type="text"
-                                      list="currencies"
-                                      placeholder="Type to search"/>
-                        <datalist id="currencies">
-                            {currenciesOptions}
-                        </datalist>
-
+                        <Select onChange={onCurrencySelectChange} className="my-select-container"
+                                classNamePrefix="my-select" options={currenciesOptions}/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button type="submit" className="bg-gradient" variant="primary">
+                        <Button disabled={Object.entries(props.baseCurrency.new).length === 0} type="submit"
+                                className="bg-gradient"
+                                variant="primary">
                             Save
                         </Button>
                     </Modal.Footer>

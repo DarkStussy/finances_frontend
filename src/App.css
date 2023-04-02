@@ -31,11 +31,12 @@
     display: none;
 }
 
-.form-control {
-    border: var(--bs-border-width) solid #2f2e3e;
-    color: whitesmoke;
-    background-color: var(--bs-dark);
+.form-control, .my-select__control, .my-select__menu {
+    border: var(--bs-border-width) solid #2f2e3e !important;
+    color: whitesmoke !important;
+    background-color: var(--bs-dark) !important;
 }
+
 
 .form-control:focus {
     color: whitesmoke;
@@ -52,9 +53,11 @@
 .table-dark {
     --bs-table-bg: #2a2e33;
 }
+
 .table-dark thead, tfoot {
     --bs-table-bg: #24282c;
 }
+
 #assetsFooter {
     border: hidden;
 }
@@ -74,4 +77,26 @@
 
 .table {
     table-layout: fixed;
+}
+
+.my-select__placeholder, .my-select__single-value, .my-select__input-container {
+    color: lightgrey !important;
+}
+
+.my-select__indicator-separator {
+    background-color: lightgrey !important;
+}
+
+.react-select__option {
+    background-color: var(--bs-dark) !important;
+}
+
+.my-select__option--is-focused {
+    background-color: grey !important;
+}
+
+@media (min-width: 996px) {
+    form {
+        max-width: 50%;
+    }
 }
