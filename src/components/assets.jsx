@@ -20,6 +20,8 @@ const AssetsComponent = (props) => {
                 const totalAmount = total["total"];
                 const totalColor = totalAmount >= 0 ? "var(--amount-positive)" : "var(--amount-negative)";
                 setTotal({amount: totalAmount, color: totalColor});
+            } else {
+                setTotal({amount: 0, color: "white"});
             }
         }
         const fetchData = async () => {
@@ -32,7 +34,7 @@ const AssetsComponent = (props) => {
 
         }
         fetchData().catch(console.error);
-    }, [props.accessToken, props.baseCurrency.currentCode]);
+    }, [props.accessToken, props.baseCurrency.currencyCode]);
     const navigate = useNavigate();
     const assetsRows = assets.map((asset) => {
         const currency_code = asset["currency"] ? asset["currency"]["code"] : "USD";
@@ -67,7 +69,7 @@ const AssetsComponent = (props) => {
                 <tfoot>
                 <tr id="assetsFooter">
                     <td colSpan={2} className="fw-bold">Total</td>
-                    <td colSpan={2} style={{color: total.color}}>{total.amount} {props.baseCurrency.currentCode}</td>
+                    <td colSpan={2} style={{color: total.color}}>{total.amount} {props.baseCurrency.currencyCode}</td>
                 </tr>
                 </tfoot>
             </Table>

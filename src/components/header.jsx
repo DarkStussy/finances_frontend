@@ -77,8 +77,10 @@ const Header = (props) => {
                                  ...showDropdown,
                                  fiat: v
                              })}>
-                <NavDropdown.Header>Base currency: {props.baseCurrency.currentCode}</NavDropdown.Header>
-                <NavDropdown.Item>Transactions</NavDropdown.Item>
+                <NavDropdown.Header>Base currency: {props.baseCurrency.currencyCode}</NavDropdown.Header>
+                <LinkContainer to="/transactions">
+                    <NavDropdown.Item>Transactions</NavDropdown.Item>
+                </LinkContainer>
                 <LinkContainer to="/assets">
                     <NavDropdown.Item>Assets</NavDropdown.Item>
                 </LinkContainer>
@@ -93,7 +95,7 @@ const Header = (props) => {
     let [showModal, setShowModal] = useState(false);
     const handleCloseModal = () => {
         setShowModal(false);
-        props.setBaseCurrencyState({currentCode: props.baseCurrency.currentCode, new: {}});
+        props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: {}});
     };
     const handleShow = () => setShowModal(true);
 
@@ -103,7 +105,7 @@ const Header = (props) => {
     });
 
     const onCurrencySelectChange = (option) => {
-        props.setBaseCurrencyState({currentCode: props.baseCurrency.currentCode, new: option.value});
+        props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: option.value});
     }
     const submitBaseCurrency = (e) => {
         e.preventDefault();
@@ -112,7 +114,7 @@ const Header = (props) => {
             const response = await setBaseCurrency(props.accessToken, props.baseCurrency.new["id"]);
             if (response.detail === "OK") {
                 setShowModal(false);
-                props.setBaseCurrencyState({currentCode: props.baseCurrency.new["code"], new: {}})
+                props.setBaseCurrencyState({currencyCode: props.baseCurrency.new["code"], new: {}})
             }
         }
         fetchBaseCurrency().catch(console.error);

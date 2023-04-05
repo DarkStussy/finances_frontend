@@ -1,7 +1,7 @@
 import {Button, ButtonGroup, Form} from "react-bootstrap";
 import Select from "react-select";
 
-const AssetForm = ({onSubmit, onInputChange, onCurrencySelectChange, currenciesOptions, ...props}) => {
+const AssetForm = ({type, onSubmit, onInputChange, onCurrencySelectChange, currenciesOptions, ...props}) => {
     return (
         <Form onSubmit={onSubmit} className="p-5 m-auto form">
             <Form.Group className="mb-3">
@@ -32,7 +32,7 @@ const AssetForm = ({onSubmit, onInputChange, onCurrencySelectChange, currenciesO
                     Back
                 </Button>
                 <Button className="bg-gradient" variant="primary" type="submit">
-                    Add
+                    {type}
                 </Button>
             </ButtonGroup>
             {props.deleteButton}

@@ -7,7 +7,7 @@ const Asset = (props) => {
     const location = useLocation();
     if (location.state === null)
         return <Error text="Asset not found"/>
-    else if(!props.accessToken)
+    if (!props.accessToken)
         return <Error text="Not authorizated"/>
 
     const {assetID} = location.state;

@@ -8,4 +8,14 @@ export const getInputChangeFunc = (setInput, validateInput) => {
         if (validateInput)
             validateInput(e);
     }
-}
+};
+
+
+export const getSelectChangeFunc = (setSelect) => {
+    return option => {
+        setSelect(prevState => ({
+            ...prevState,
+            [option.type]: option
+        }));
+    };
+};

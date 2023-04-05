@@ -14,6 +14,9 @@ import {useEffect, useState} from "react";
 import {getBaseCurrency} from "./functions/currency";
 import AddAsset from "./pages/add_asset";
 import ChangeAsset from "./pages/change_asset";
+import Transactions from "./pages/transactions";
+import AddTransaction from "./pages/add_transaction";
+import ChangeTransaction from "./pages/change_transaction";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -21,17 +24,17 @@ export const apiUrl = process.env.REACT_APP_API_URL;
 const App = () => {
     const {accessToken, setAccessToken} = useAccessToken();
     let [baseCurrency, setBaseCurrencyState] = useState({
-        currentCode: "USD",
+        currencyCode: "USD",
         new: {}
     });
     useEffect(() => {
-        if(accessToken) {
+        if (accessToken) {
             const getAndSetBaseCurrency = async () => {
                 const baseCurrency = await getBaseCurrency(accessToken);
                 if (!baseCurrency.detail)
                     setBaseCurrencyState(prevState => ({
                         new: prevState.new,
-                        currentCode: baseCurrency["code"]
+                        currencyCode: baseCurrency["code"]
                     }));
             }
             getAndSetBaseCurrency().catch(console.error);
@@ -53,6 +56,10 @@ const App = () => {
                     <Route path={'/asset'} element={<Asset accessToken={accessToken}/>}/>
                     <Route path={'/addAsset'} element={<AddAsset accessToken={accessToken}/>}/>
                     <Route path={'/changeAsset'} element={<ChangeAsset accessToken={accessToken}/>}/>
+                    <Route path={'/transactions'}
+                           element={<Transactions accessToken={accessToken} baseCurrency={baseCurrency}/>}/>
+                    <Route path={'/addTransaction'} element={<AddTransaction accessToken={accessToken}/>}/>
+                    <Route path={'/changeTransaction'} element={<ChangeTransaction accessToken={accessToken}/>}/>
                 </Routes>
             </main>
             <Footer/>

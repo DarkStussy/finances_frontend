@@ -135,7 +135,7 @@ const ChangeAssetComponent = (props) => {
         <Container className="p-5 text-center">
             <BaseAlert type={showAlert.alertType} alert_text={showAlert.msg} show={showAlert.show} setShow={setShow}/>
             <h2 className="mt-2">Change asset</h2>
-            <AssetForm onClickBack={onClickBack} onSubmit={onSubmit} onInputChange={onInputChange}
+            <AssetForm type="Change" onClickBack={onClickBack} onSubmit={onSubmit} onInputChange={onInputChange}
                        onCurrencySelectChange={onCurrencySelectChange}
                        currenciesOptions={currenciesOptions}
                        currencyOption={changedAsset.currency}
