@@ -101,7 +101,7 @@ const CategoriesComponent = (props) => {
     };
 
     return (
-        <Container className="w-50 p-4">
+        <Container className="categories p-4">
             <div className="d-flex align-items-center justify-content-center">
                 <h2 className="text-center p-3">Transaction categories</h2>
                 <FontAwesomeIcon

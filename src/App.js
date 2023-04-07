@@ -18,6 +18,7 @@ import Transactions from "./pages/transactions";
 import AddTransaction from "./pages/add_transaction";
 import ChangeTransaction from "./pages/change_transaction";
 import Categories from "./pages/categories";
+import FiatStats from "./pages/fiat_stats";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -63,6 +64,8 @@ const App = () => {
                     <Route path={'/addTransaction'} element={<AddTransaction accessToken={accessToken}/>}/>
                     <Route path={'/changeTransaction'} element={<ChangeTransaction accessToken={accessToken}/>}/>
                     <Route path={'/categories'} element={<Categories accessToken={accessToken}/>}/>
+                    <Route path={'/fiatStats'}
+                           element={<FiatStats accessToken={accessToken} baseCurrency={baseCurrency}/>}/>
                     {/* crypto */}
                 </Routes>
             </main>

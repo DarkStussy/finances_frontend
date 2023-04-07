@@ -84,7 +84,9 @@ const Header = (props) => {
                 <LinkContainer to="/assets">
                     <NavDropdown.Item>Assets</NavDropdown.Item>
                 </LinkContainer>
-                <NavDropdown.Item>Stats</NavDropdown.Item>
+                <LinkContainer to="/fiatStats">
+                    <NavDropdown.Item>Stats</NavDropdown.Item>
+                </LinkContainer>
                 <LinkContainer to="/categories">
                     <NavDropdown.Item>Categories</NavDropdown.Item>
                 </LinkContainer>
