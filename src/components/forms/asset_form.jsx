@@ -9,7 +9,7 @@ const AssetForm = ({type, onSubmit, onInputChange, onCurrencySelectChange, curre
                               type="text" name="assetTitle"
                               placeholder="Title"
                               value={props.assetTitle}
-                              minLength={3} maxLength={100} required/>
+                              minLength={3} maxLength={50} required/>
                 <Form.Text className="text-white">
                     From 3 to 100 characters
                 </Form.Text>

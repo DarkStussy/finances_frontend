@@ -17,6 +17,7 @@ import ChangeAsset from "./pages/change_asset";
 import Transactions from "./pages/transactions";
 import AddTransaction from "./pages/add_transaction";
 import ChangeTransaction from "./pages/change_transaction";
+import Categories from "./pages/categories";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -51,6 +52,7 @@ const App = () => {
                     <Route path={'/login'} element={<SignIn setAccessToken={setAccessToken}/>}/>
                     <Route path={'/signup'} element={<SignUp/>}/>
                     <Route path={'/changePassword'} element={<ChangePassword accessToken={accessToken}/>}/>
+                    {/* fiat */}
                     <Route path={'/assets'} element={<Assets accessToken={accessToken} baseCurrency={baseCurrency}
                                                              setBaseCurrencyState={setBaseCurrencyState}/>}/>
                     <Route path={'/asset'} element={<Asset accessToken={accessToken}/>}/>
@@ -60,6 +62,8 @@ const App = () => {
                            element={<Transactions accessToken={accessToken} baseCurrency={baseCurrency}/>}/>
                     <Route path={'/addTransaction'} element={<AddTransaction accessToken={accessToken}/>}/>
                     <Route path={'/changeTransaction'} element={<ChangeTransaction accessToken={accessToken}/>}/>
+                    <Route path={'/categories'} element={<Categories accessToken={accessToken}/>}/>
+                    {/* crypto */}
                 </Routes>
             </main>
             <Footer/>

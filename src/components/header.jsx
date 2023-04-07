@@ -85,6 +85,9 @@ const Header = (props) => {
                     <NavDropdown.Item>Assets</NavDropdown.Item>
                 </LinkContainer>
                 <NavDropdown.Item>Stats</NavDropdown.Item>
+                <LinkContainer to="/categories">
+                    <NavDropdown.Item>Categories</NavDropdown.Item>
+                </LinkContainer>
                 <NavDropdown.Item onClick={handleShow}>Change base currency</NavDropdown.Item>
             </BaseNavDropdown>
             <Nav.Link>Crypto</Nav.Link>

@@ -123,7 +123,7 @@ const ChangeTransactionComponent = (props) => {
             <Modal centered show={showDeleteModal} onHide={handleCloseDeleteModal}
                    style={{background: "rgba(0, 0, 0, 0.5)"}}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Delete asset</Modal.Title>
+                    <Modal.Title>Delete transaction</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Are you sure you want to delete transaction?
