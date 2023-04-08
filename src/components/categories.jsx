@@ -137,6 +137,7 @@ const CategoriesComponent = (props) => {
                                       name="categoryTitle"
                                       value={input.categoryTitle} minLength={3} maxLength={50}/>
                         <Select className="my-select-container text-start mt-3"
+                                isSearchable={false}
                                 options={typesOptions}
                                 value={input.transactionType}
                                 onChange={onChangeSelect}

@@ -49,7 +49,7 @@ const FiatStatsComponent = (props) => {
             default:
                 break;
         }
-    }, [options.date, options.fiatStatsType, options.type, props.accessToken]);
+    }, [props.baseCurrency.currencyCode, options.date, options.fiatStatsType, options.type, props.accessToken]);
     const getSliderValue = () => {
         let value;
         switch (options.fiatStatsType.value) {

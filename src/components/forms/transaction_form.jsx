@@ -21,6 +21,7 @@ const TransactionForm = ({type, onSubmit, onInputChange, ...props}) => {
             </Form.Group>
             <Form.Group className="mb-3">
                 <Select className="my-select-container text-start"
+                        isSearchable={false}
                         options={props.typesOptions}
                         value={props.transactionType}
                         onChange={props.onChangeSelect}
