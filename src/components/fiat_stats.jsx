@@ -20,6 +20,7 @@ const FiatStatsComponent = (props) => {
     });
     const [totalCategories, setTotalCategories] = useState({total: 0, list: []});
     useEffect(() => {
+        if (!isLoading) return;
         const setData = (startDate, endDate) => {
             getTotalCategoriesByPeriod(props.accessToken, startDate, endDate, options.type).then(data => {
                 if (!data.detail) {

@@ -31,6 +31,7 @@ const CryptoAssetComponent = (props) => {
     });
     const [showCryptoTransactionForm, setShowCryptoTransactionForm] = useState(false);
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetCryptoAsset = async () => {
             const data = await sendAPIRequest(props.accessToken, `/cryptoAsset/${props.cryptoAssetID}`);
             if (data.detail) setAsset(prevState => ({price: prevState.price, data: undefined}));

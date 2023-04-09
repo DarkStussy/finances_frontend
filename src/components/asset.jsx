@@ -14,6 +14,7 @@ const AssetComponent = (props) => {
         {totals: {total_income: 0, total_expense: 0}, data: [], asset: {amount: 0}});
     const [date, setDate] = useState(new Date());
     useEffect(() => {
+        if (!isLoading) return;
         const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
         const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
         const getAndSetAssetTransactionsData = async () => {

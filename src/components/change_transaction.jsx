@@ -41,6 +41,7 @@ const ChangeTransactionComponent = (props) => {
     });
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
             setRequestData(prevState => ({categories: prevState.categories, assets: assets}));

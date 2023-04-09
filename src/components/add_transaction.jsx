@@ -28,6 +28,7 @@ const AddTransactionComponent = (props) => {
     const [showAlert, setShowAlert] = useState(
         {msg: "", show: false});
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
             setRequestData(prevState => ({categories: prevState.categories, assets: assets}));

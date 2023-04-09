@@ -11,6 +11,8 @@ const TransactionsComponent = (props) => {
     const [transactions, setTransactions] = useState({income: 0, expense: 0, list: []});
     const [date, setDate] = useState(new Date());
     useEffect(() => {
+        if (!isLoading) return;
+
         const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
         const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
 

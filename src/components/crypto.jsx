@@ -33,6 +33,7 @@ const CryptoComponent = (props) => {
         price: ""
     });
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetPortfoliosData = async () => {
             const portfolios = await sendAPIRequest(props.accessToken, "/cryptoportfolio/all", "GET");
             setPortfolios(portfolios);
@@ -63,6 +64,7 @@ const CryptoComponent = (props) => {
     );
     useEffect(() => {
         if (!portfolioData.portfolio) return;
+        if (!isLoading) return;
         const getAndSetCryptoAssets = async () => {
             const queryParams = new URLSearchParams({
                 "portfolio_id": portfolioData.portfolio.value.id
@@ -108,6 +110,7 @@ const CryptoComponent = (props) => {
     }, [assets.list, props.accessToken]);
     useEffect(() => {
         if (!portfolioData.portfolio) return;
+        if (!isLoading) return;
         const fetchTotalByPortfolio = async () => {
             const queryParams = new URLSearchParams({
                 "portfolio_id": portfolioData.portfolio.value.id

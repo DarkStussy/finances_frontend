@@ -26,6 +26,7 @@ const CategoriesComponent = (props) => {
         transactionType: ""
     });
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetTransactionCategoriesData = async () => {
             const response = await getAllTransactionCategories(props.accessToken, categories.type)
             setCategories(prevState => (

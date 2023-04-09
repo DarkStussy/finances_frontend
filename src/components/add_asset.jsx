@@ -14,6 +14,7 @@ const AddAssetComponent = (props) => {
     const [input, setInput] = useState({currency: null, assetTitle: "", assetAmount: ""});
     const [showAlert, setShowAlert] = useState({alertType: "", msg: "", show: false});
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetCurrencies = async () => {
             const currencies = await getAllCurrencies(props.accessToken, "default");
             if (!currencies.detail)

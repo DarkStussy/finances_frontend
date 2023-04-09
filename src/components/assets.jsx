@@ -12,6 +12,7 @@ const AssetsComponent = (props) => {
     const [assets, setAssets] = useState([]);
     const [total, setTotal] = useState({amount: 0, color: "white"});
     useEffect(() => {
+        if (!isLoading) return;
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
             setAssets(assets);
