@@ -207,7 +207,7 @@ const CryptoComponent = (props) => {
             currencyPrice: "",
             transactionAmount: "",
             transactionCreated: getISODatetime(new Date()),
-            portfolioTitle: ""
+            portfolioTitle: input.portfolioTitle
         })
     };
     const clearError = () => {
@@ -236,7 +236,8 @@ const CryptoComponent = (props) => {
         setShowEditPortfolio(false);
     };
     const showEditPortfolioModal = () => {
-        setShowEditPortfolio(true);
+        if (portfolioData.portfolio)
+            setShowEditPortfolio(true);
     };
 
     const onChangeTransactionType = e => {
@@ -315,6 +316,28 @@ const CryptoComponent = (props) => {
         addTransaction().catch(console.error);
     }
 
+    const onSubmitEditPortfolio = (e) => {
+        e.preventDefault();
+        const body = JSON.stringify({
+            "title": input.portfolioTitle,
+            "id": portfolioData.portfolio.value.id
+        });
+        sendAPIRequestWithBody(props.accessToken, "/cryptoportfolio/change", body, "PUT").then(portfolio => {
+            if (!portfolio.detail) {
+                const portfolioTitle = portfolio["title"];
+                setPortfolioData({
+                    ...portfolioData,
+                    portfolio: {label: portfolioTitle, value: portfolio, type: "portfolio"},
+                    reload: true
+                });
+                setInput({...input, portfolioTitle: portfolioTitle});
+                setIsLoading(true);
+            }
+            hideEditPortfolioModal();
+        }).catch(console.error);
+    };
+
+
     return (
         <Container className="crypto">
             <Row className="mt-4 text-center">
@@ -366,6 +389,7 @@ const CryptoComponent = (props) => {
                 </Table>
             )}
             <CryptoTransactionFormModal
+                type="Add"
                 onSubmit={onSubmitAddTransaction}
                 showModal={showAddTransaction} hideModal={hideAddTransactionModal}
                 transactionType={input.type}
@@ -383,7 +407,7 @@ const CryptoComponent = (props) => {
                 <Modal.Header closeButton>
                     <Modal.Title>Edit portfolio</Modal.Title>
                 </Modal.Header>
-                <Form>
+                <Form onSubmit={onSubmitEditPortfolio}>
                     <Modal.Body>
                         <Form.Group>
                             <Form.Label>Portfolio title</Form.Label>

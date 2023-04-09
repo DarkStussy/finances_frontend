@@ -7,7 +7,7 @@ const CryptoTransactionFormModal = (props) => {
     return (
         <Modal centered show={props.showModal} onHide={props.hideModal}>
             <Modal.Header closeButton>
-                <Modal.Title>Add transaction</Modal.Title>
+                <Modal.Title>{props.type} transaction</Modal.Title>
             </Modal.Header>
             <Form onSubmit={props.onSubmit}>
                 <Modal.Body>
