@@ -29,7 +29,7 @@ const AssetsComponent = (props) => {
                 [getAndSetAssetsData(), getAnsSetTotalAssetsData()])
                 .then((results) => results.forEach((result) => {
                     if (result.status === "rejected")
-                        console.log(result.reason);
+                        console.error(result.reason);
                 }));
 
         }

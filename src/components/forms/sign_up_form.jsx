@@ -95,7 +95,7 @@ const SignUpForm = () => {
                     setError({...error, detail: detail});
                 }
             })
-            .catch(error => console.log('error', error));
+            .catch(error => console.error(error));
     }
 
     const onInputChange = getInputChangeFunc(setInput, validateInput);

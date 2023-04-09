@@ -38,11 +38,11 @@ const ChangeAssetComponent = (props) => {
                 [getAndSetCurrencies(), getAndSetAssetData()])
                 .then((results) => results.forEach((result) => {
                     if (result.status === "rejected")
-                        console.log(result.reason);
+                        console.error(result.reason);
                 }));
 
         }
-        fetchData().catch(console.log);
+        fetchData().catch(console.error);
     }, [props.assetID, props.accessToken]);
 
     const currenciesOptions = currencies.map((currency) => {

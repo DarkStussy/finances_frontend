@@ -8,12 +8,16 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getAllCurrencies, setBaseCurrency} from "../functions/currency";
 import {useNavigate} from "react-router-dom";
 import Select from "react-select";
+import {sendAPIRequest} from "../functions/requests";
 
 
 const Header = (props) => {
     let [user, setUser] = useState({username: ""});
-    let [currencies, setCurrencies] = useState([]);
-    const [showDropdown, setShowDropdown] = useState({userInfo: false, fiat: false});
+    let [currencies, setCurrencies] = useState({choice: null, list: []});
+    let [portfolios, setPortfolios] = useState({choice: null, list: []});
+    let [showUserInfoDropdown, setShowUserInfoDropdown] = useState(false);
+    let [showCryptoDropdown, setShowCryptoDropdown] = useState(false);
+    let [showFiatDropdown, setShowFiatDropdown] = useState(false);
     useEffect(() => {
         if (!props.accessToken)
             return;
@@ -22,27 +26,13 @@ const Header = (props) => {
             setUser({username: user['username']});
         };
 
-        const getAndSetCurrencies = async () => {
-            const currencies = await getAllCurrencies(props.accessToken, "default");
-            if (!currencies.detail)
-                setCurrencies(currencies);
-        }
-        const fetchData = async () => {
-            await Promise.allSettled(
-                [getUsername(), getAndSetCurrencies()])
-                .then((results) => results.forEach((result) => {
-                    if (result.status === "rejected")
-                        console.error(result.reason);
-                }));
-
-        }
-        fetchData().catch(console.error);
+        getUsername().catch(console.error);
     }, [props.accessToken]);
     const navigate = useNavigate();
     const logout = () => {
         props.setAccessToken(null);
         setUser({username: ""});
-        setShowDropdown({...showDropdown, userInfo: false});
+        setShowUserInfoDropdown(false);
         navigate('/');
     };
 
@@ -50,8 +40,8 @@ const Header = (props) => {
         if (user.username) {
             return (
                 <BaseNavDropdown title={<FontAwesomeIcon icon={faEllipsisVertical}/>}
-                                 drop="start" show={showDropdown.userInfo}
-                                 setShow={(v) => setShowDropdown({...showDropdown, userInfo: v})}>
+                                 drop="start" show={showUserInfoDropdown}
+                                 setShow={(v) => setShowUserInfoDropdown(v)}>
                     <NavDropdown.Header>Username: {user.username}</NavDropdown.Header>
                     <LinkContainer to="/changePassword">
                         <NavDropdown.Item>Change password</NavDropdown.Item>
@@ -66,17 +56,20 @@ const Header = (props) => {
                 </LinkContainer>
             )
         }
-    }
+    };
 
-    const getNavlinks = () => {
+    const loadCurrencies = async () => {
+        const currencies = await getAllCurrencies(props.accessToken, "default");
+        setCurrencies(prevState => ({choice: prevState.choice, list: currencies}));
+        setShowBaseCurrencyModal(true);
+    };
+
+    const getFiatDropdown = () => {
         if (!props.accessToken)
             return <></>
-        return <>
-            <BaseNavDropdown title="Fiat" drop="down-centered" show={showDropdown.fiat}
-                             setShow={(v) => setShowDropdown({
-                                 ...showDropdown,
-                                 fiat: v
-                             })}>
+        return (
+            <BaseNavDropdown id="fiat" title="Fiat" drop="down-centered" show={showFiatDropdown}
+                             setShow={(v) => setShowFiatDropdown(v)}>
                 <NavDropdown.Header>Base currency: {props.baseCurrency.currencyCode}</NavDropdown.Header>
                 <LinkContainer to="/transactions">
                     <NavDropdown.Item>Transactions</NavDropdown.Item>
@@ -90,41 +83,81 @@ const Header = (props) => {
                 <LinkContainer to="/categories">
                     <NavDropdown.Item>Categories</NavDropdown.Item>
                 </LinkContainer>
-                <NavDropdown.Item onClick={handleShow}>Change base currency</NavDropdown.Item>
+                <NavDropdown.Item onClick={loadCurrencies}>Change base currency</NavDropdown.Item>
             </BaseNavDropdown>
-            <Nav.Link>Crypto</Nav.Link>
-        </>
+        );
+    };
 
+    const loadPortfolios = async () => {
+        const portfolios = await sendAPIRequest(props.accessToken, "/cryptoportfolio/all", "GET");
+        setPortfolios(prevState => ({choice: prevState.choice, list: portfolios}));
+        setShowBasePortfolioModal(true);
+    };
+    const getCryptoDropdown = () => {
+        if (!props.accessToken)
+            return <></>
+        return (
+            <BaseNavDropdown id="crypto" title="Crypto" drop="down-centered" show={showCryptoDropdown}
+                             setShow={(v) => setShowCryptoDropdown(v)}>
+                <LinkContainer to="/crypto">
+                    <NavDropdown.Item>Crypto</NavDropdown.Item>
+                </LinkContainer>
+                <NavDropdown.Item onClick={loadPortfolios}>Change base portfolio</NavDropdown.Item>
+            </BaseNavDropdown>
+        );
     }
 
-    let [showModal, setShowModal] = useState(false);
-    const handleCloseModal = () => {
-        setShowModal(false);
+    let [showBaseCurrencyModal, setShowBaseCurrencyModal] = useState(false);
+    const handleCloseBaseCurrencyModal = () => {
+        setShowBaseCurrencyModal(false);
         props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: {}});
     };
-    const handleShow = () => setShowModal(true);
 
-    const currenciesOptions = currencies.map((currency) => {
+    const currenciesOptions = currencies.list.map((currency) => {
         const currencyCode = currency["code"];
         return {label: `${currency["name"]} | ${currencyCode}`, value: currency};
     });
 
     const onCurrencySelectChange = (option) => {
-        props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: option.value});
-    }
+        setCurrencies(prevState => ({choice: option.value, list: prevState.list}));
+    };
     const submitBaseCurrency = (e) => {
         e.preventDefault();
 
         const fetchBaseCurrency = async () => {
-            const response = await setBaseCurrency(props.accessToken, props.baseCurrency.new["id"]);
+            const response = await setBaseCurrency(props.accessToken, currencies.choice["id"]);
             if (response.detail === "OK") {
-                setShowModal(false);
-                props.setBaseCurrencyState({currencyCode: props.baseCurrency.new["code"], new: {}})
+                setShowBaseCurrencyModal(false);
+                props.setBaseCurrencyState({currencyCode: currencies.choice["code"]});
+                setCurrencies(prevState => ({choice: null, list: prevState.list}));
             }
         }
         fetchBaseCurrency().catch(console.error);
+    };
+    let [showBasePortfolioModal, setShowBasePortfolioModal] = useState(false);
+    const handleClosePortfolioModal = () => setShowBasePortfolioModal(false);
 
+    const portfoliosOptions = portfolios.list.map((portfolio) => {
+        return {label: portfolio["title"], value: portfolio};
+    });
+
+    const onPortfolioSelectChange = (option) => {
+        setPortfolios(prevState => ({choice: option.value, list: prevState.list}));
+    };
+
+    const onSubmitBasePortfolio = e => {
+        e.preventDefault();
+        const fetchBasePortfolio = async () => {
+            const route = `/cryptoportfolio/baseCryptoportfolio/${portfolios.choice["id"]}`;
+            const response = await sendAPIRequest(props.accessToken, route, "PUT");
+            if (response.detail === "OK") {
+                setShowBasePortfolioModal(false);
+                setPortfolios(prevState => ({choice: null, list: prevState.list}));
+            }
+        };
+        fetchBasePortfolio().catch(console.error);
     }
+
     return (
         <>
             <header>
@@ -136,7 +169,8 @@ const Header = (props) => {
                         <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                         <Navbar.Collapse id="responsive-navbar-nav">
                             <Nav className="me-auto">
-                                {getNavlinks()}
+                                {getFiatDropdown()}
+                                {getCryptoDropdown()}
                             </Nav>
                             <Nav>
                                 {getUserInfo()}
@@ -145,7 +179,7 @@ const Header = (props) => {
                     </Container>
                 </Navbar>
             </header>
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showBaseCurrencyModal} onHide={handleCloseBaseCurrencyModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Change base currency</Modal.Title>
                 </Modal.Header>
@@ -155,7 +189,27 @@ const Header = (props) => {
                                 classNamePrefix="my-select" options={currenciesOptions}/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button disabled={Object.entries(props.baseCurrency.new).length === 0} type="submit"
+                        <Button disabled={currencies.choice === null} type="submit"
+                                className="bg-gradient"
+                                variant="primary">
+                            Save
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+            <Modal show={showBasePortfolioModal} onHide={handleClosePortfolioModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Change base portfolio</Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={onSubmitBasePortfolio}>
+                    <Modal.Body>
+                        <Select className="my-select-container" classNamePrefix="my-select"
+                                onChange={onPortfolioSelectChange}
+                                options={portfoliosOptions}
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button type="submit"
                                 className="bg-gradient"
                                 variant="primary">
                             Save

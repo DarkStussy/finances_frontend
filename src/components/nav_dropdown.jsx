@@ -4,6 +4,7 @@ import {NavDropdown} from "react-bootstrap";
 const BaseNavDropdown = ({title, children, ...props}) => {
     return (
         <NavDropdown
+            id={props.id}
             title={title}
             menuVariant="dark" drop={props.drop}
             show={props.show}

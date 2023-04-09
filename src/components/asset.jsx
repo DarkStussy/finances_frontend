@@ -36,7 +36,7 @@ const AssetComponent = (props) => {
                 [getAndSetAssetTransactionsData(), getAndSetTotalsByAssetData(), getAndSetAssetData()])
                 .then((results) => results.forEach((result) => {
                     if (result.status === "rejected")
-                        console.log(result.reason);
+                        console.error(result.reason);
                 }));
         }
         fetchData().catch(console.error);

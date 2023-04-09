@@ -77,7 +77,7 @@ const ChangePasswordForm = (props) => {
                 setShow(true);
                 setInput({password: "", confirm_password: ""});
             })
-            .catch(error => console.log('error', error));
+            .catch(error => console.error(error));
     }
 
     let [show, setShow] = useState(false);

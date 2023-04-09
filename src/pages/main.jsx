@@ -21,7 +21,7 @@ const Main = () => {
                         using it
                         and managing your finances and crypto portfolios.</p>
                     <p>Join us and start controlling your expenses and incomes, as well as managing your <Link
-                        to={"#crypto"}>crypto
+                        to={'/crypto'}>crypto
                         portfolios</Link> today!</p>
                 </Col>
             </Row>

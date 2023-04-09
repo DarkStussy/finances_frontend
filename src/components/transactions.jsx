@@ -30,7 +30,7 @@ const TransactionsComponent = (props) => {
                 [getAndSetAllTransactionsData(), getAndSetTotalData('income'), getAndSetTotalData('expense')])
                 .then((results) => results.forEach((result) => {
                     if (result.status === "rejected")
-                        console.log(result.reason);
+                        console.error(result.reason);
                 }));
         }
         fetchData().catch(console.error);
