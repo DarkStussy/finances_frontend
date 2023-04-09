@@ -108,10 +108,7 @@ const Header = (props) => {
     }
 
     const [showBaseCurrencyModal, setShowBaseCurrencyModal] = useState(false);
-    const handleCloseBaseCurrencyModal = () => {
-        setShowBaseCurrencyModal(false);
-        props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: {}});
-    };
+    const handleCloseBaseCurrencyModal = () => setShowBaseCurrencyModal(false);
 
     const currenciesOptions = currencies.list.map((currency) => {
         const currencyCode = currency["code"];

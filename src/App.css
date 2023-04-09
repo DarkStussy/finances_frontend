@@ -121,6 +121,10 @@
     vertical-align: middle;
 }
 
+.clickable-row {
+    cursor: pointer;
+}
+
 
 @media (min-width: 768px) {
     .form {
@@ -135,8 +139,8 @@
         max-width: 75%;
     }
 
-    .crypto {
-        max-width: 100%;
+    .table-response {
+        max-width: 90%;
     }
 }
 
@@ -153,7 +157,7 @@
         max-width: 50%;
     }
 
-    .crypto {
+    .table-response {
         max-width: 75%;
     }
 }

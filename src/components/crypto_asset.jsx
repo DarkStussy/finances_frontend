@@ -109,7 +109,7 @@ const CryptoAssetComponent = (props) => {
             "var(--amount-negative)";
         const transactionID = transaction["id"];
         return (
-            <tr key={transactionID} className="crypto-transaction table-text crypto-transaction-row" style={{cursor: "pointer"}}
+            <tr key={transactionID} className="crypto-transaction table-text crypto-transaction-row clickable-row"
                 onClick={() => showEditTransactionModal(transactionID, type, amount, datetime)}>
                 <td className="text-start">
                     {datetime.toLocaleDateString('en-US', {

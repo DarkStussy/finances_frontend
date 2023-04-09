@@ -45,7 +45,7 @@ const TransactionsComponent = (props) => {
             const currencyCode = transaction["asset"]["currency"]["code"];
             const amountColor = transaction["category"]["type"] === "income" ? "var(--amount-positive)" :
                 "var(--amount-negative)";
-            return <tr key={transactionID} className="table-text crypto-transaction-row"
+            return <tr key={transactionID} className="table-text crypto-transaction-row clickable-row"
                        onClick={() => navigate('/changeTransaction', {state: {transaction, fromAsset: false}})}>
                 <td>{transaction["category"]["title"]}</td>
                 <td></td>

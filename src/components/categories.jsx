@@ -63,10 +63,11 @@ const CategoriesComponent = (props) => {
             <tr key={category.id}>
                 <td colSpan={2} className="text-center">{category.title}</td>
                 <td colSpan={2} className="text-end">
-                    <FontAwesomeIcon onClick={handleShowEditModal(category)} className="me-2" icon={faPenToSquare}
-                                     size="lg" style={{cursor: "pointer"}}/>
+                    <FontAwesomeIcon onClick={handleShowEditModal(category)} className="me-2 clickable-row"
+                                     icon={faPenToSquare}
+                                     size="lg"/>
                     <FontAwesomeIcon onClick={handleShowDeleteModal(category)} icon={faTrash} size="lg"
-                                     style={{cursor: "pointer"}}/>
+                                     className="clickable-row"/>
                 </td>
             </tr>
         );
@@ -110,9 +111,8 @@ const CategoriesComponent = (props) => {
             <div className="d-flex align-items-center justify-content-center">
                 <h2 className="text-center p-3">Transaction categories</h2>
                 <FontAwesomeIcon
-                    style={{cursor: "pointer"}}
                     onClick={handleShowAddModal}
-                    className="mb-1"
+                    className="mb-1 clickable-row"
                     icon={faPlus}
                     size="xl"/>
             </div>

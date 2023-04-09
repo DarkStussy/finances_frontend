@@ -61,7 +61,7 @@ const AssetComponent = (props) => {
             const transactionID = transaction["id"];
             const amountColor = transaction["category"]["type"] === "income" ? "var(--amount-positive)" :
                 "var(--amount-negative)";
-            return <tr key={transactionID} className="table-text crypto-transaction-row"
+            return <tr key={transactionID} className="table-text crypto-transaction-row clickable-row"
                        onClick={() => navigate('/changeTransaction', {state: {transaction, fromAsset: true}})}>
                 <td>{transaction["category"]["title"]}</td>
                 <td></td>
@@ -94,8 +94,7 @@ const AssetComponent = (props) => {
             <div className="d-flex align-items-center justify-content-center">
                 <h2 className="p-4 text-center">{assetTransactions.asset.title}</h2>
                 <FontAwesomeIcon
-                    style={{cursor: "pointer"}}
-                    className="mb-2"
+                    className="mb-2 clickable-row"
                     onClick={() => navigate('/changeAsset', {state: {assetID: assetTransactions.asset.id}})}
                     icon={faPenToSquare}
                     size="lg"

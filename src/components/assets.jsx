@@ -47,19 +47,18 @@ const AssetsComponent = (props) => {
             <tr onClick={(e) => {
                 e.preventDefault();
                 navigate('/asset', {state: {assetID}});
-            }} key={assetID} className="table-text crypto-transaction-row">
+            }} key={assetID} className="table-text crypto-transaction-row clickable-row">
                 <td colSpan={2}>{asset["title"]}</td>
                 <td colSpan={2} style={{color: amountColor}}>{asset["amount"]} {currency_code}</td>
             </tr>
         );
     })
     return (
-        <Container>
+        <Container className="table-response">
             <div className="d-flex align-items-center justify-content-center">
                 <h2 className="p-4 text-center">Assets</h2>
                 <FontAwesomeIcon
-                    style={{cursor: "pointer"}}
-                    className="mb-1"
+                    className="mb-1 clickable-row"
                     onClick={() => navigate('/addAsset')}
                     icon={faPlus}
                     size="xl"/>

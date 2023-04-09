@@ -32,7 +32,7 @@ const CryptoTransactionFormModal = (props) => {
                                       placeholder="Price"
                                       maxLength={17}
                                       onChange={props.onInputChange}
-                                      defaultValue={props.currencyPrice}
+                                      value={props.currencyPrice}
                                       required/>
                         {errorInput(props.error.price)}
                         <Form.Control autoComplete="off" className="mt-3" type="number" name="transactionAmount"

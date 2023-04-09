@@ -171,7 +171,7 @@ const CryptoComponent = (props) => {
         const amount = asset["amount"]
         return (
             <tr key={code} onClick={() => navigate('/cryptoAsset', {state: {cryptoAssetID: asset["id"]}})}
-                style={{cursor: "pointer"}} className="table-text crypto-transaction-row">
+                className="table-text crypto-transaction-row clickable-row">
                 <td className="text-start m-auto"><b>{asset["crypto_currency"]["name"]}</b></td>
                 <td className="text-center">
                     {amount}
@@ -291,7 +291,7 @@ const CryptoComponent = (props) => {
 
 
     return (
-        <Container className="crypto">
+        <Container className="table-response">
             <Row className="mt-4 text-center">
                 <Col sm={4} className="mt-2">
                     <CreatableSelect className="my-select-container text-start"
