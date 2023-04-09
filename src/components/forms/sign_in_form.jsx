@@ -8,8 +8,8 @@ import {useNavigate} from "react-router-dom";
 
 
 const SignInForm = (props) => {
-    let [input, setInput] = useState({username: "", password: ""});
-    let [error, setError] = useState({detail: ""});
+    const [input, setInput] = useState({username: "", password: ""});
+    const [error, setError] = useState({detail: ""});
     const onInputChange = getInputChangeFunc(setInput);
     const navigate = useNavigate();
     const onSubmit = (e) => {
@@ -35,7 +35,7 @@ const SignInForm = (props) => {
             });
     }
     return (
-        <Form onSubmit={onSubmit} className="p-5 m-auto form">
+        <Form onSubmit={onSubmit} className="p-4 m-auto form">
             <UsernameInput onChange={onInputChange}/>
             <PasswordInput onChange={onInputChange}/>
             <span className="text-danger small">

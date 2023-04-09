@@ -12,12 +12,12 @@ import {sendAPIRequest} from "../functions/requests";
 
 
 const Header = (props) => {
-    let [user, setUser] = useState({username: ""});
-    let [currencies, setCurrencies] = useState({choice: null, list: []});
-    let [portfolios, setPortfolios] = useState({choice: null, list: []});
-    let [showUserInfoDropdown, setShowUserInfoDropdown] = useState(false);
-    let [showCryptoDropdown, setShowCryptoDropdown] = useState(false);
-    let [showFiatDropdown, setShowFiatDropdown] = useState(false);
+    const [user, setUser] = useState({username: ""});
+    const [currencies, setCurrencies] = useState({choice: null, list: []});
+    const [portfolios, setPortfolios] = useState({choice: null, list: []});
+    const [showUserInfoDropdown, setShowUserInfoDropdown] = useState(false);
+    const [showCryptoDropdown, setShowCryptoDropdown] = useState(false);
+    const [showFiatDropdown, setShowFiatDropdown] = useState(false);
     useEffect(() => {
         if (!props.accessToken)
             return;
@@ -107,7 +107,7 @@ const Header = (props) => {
         );
     }
 
-    let [showBaseCurrencyModal, setShowBaseCurrencyModal] = useState(false);
+    const [showBaseCurrencyModal, setShowBaseCurrencyModal] = useState(false);
     const handleCloseBaseCurrencyModal = () => {
         setShowBaseCurrencyModal(false);
         props.setBaseCurrencyState({currencyCode: props.baseCurrency.currencyCode, new: {}});
@@ -134,7 +134,7 @@ const Header = (props) => {
         }
         fetchBaseCurrency().catch(console.error);
     };
-    let [showBasePortfolioModal, setShowBasePortfolioModal] = useState(false);
+    const [showBasePortfolioModal, setShowBasePortfolioModal] = useState(false);
     const handleClosePortfolioModal = () => setShowBasePortfolioModal(false);
 
     const portfoliosOptions = portfolios.list.map((portfolio) => {

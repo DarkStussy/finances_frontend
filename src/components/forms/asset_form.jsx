@@ -3,15 +3,16 @@ import Select from "react-select";
 
 const AssetForm = ({type, onSubmit, onInputChange, onCurrencySelectChange, currenciesOptions, ...props}) => {
     return (
-        <Form onSubmit={onSubmit} className="p-5 m-auto form">
+        <Form onSubmit={onSubmit} className="p-4 m-auto form">
             <Form.Group className="mb-3">
-                <Form.Control onChange={onInputChange}
+                <Form.Control autoComplete="off"
+                              onChange={onInputChange}
                               type="text" name="assetTitle"
                               placeholder="Title"
                               value={props.assetTitle}
                               minLength={3} maxLength={50} required/>
                 <Form.Text className="text-white">
-                    From 3 to 100 characters
+                    From 3 to 50 characters
                 </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -22,6 +23,7 @@ const AssetForm = ({type, onSubmit, onInputChange, onCurrencySelectChange, curre
             </Form.Group>
             <Form.Group className="mb-4">
                 <Form.Control onChange={onInputChange}
+                              autoComplete="off"
                               type="text" name="assetAmount" placeholder="Amount"
                               value={props.assetAmount}
                               maxLength={17}

@@ -1,10 +1,10 @@
-import Error from "../components/error";
 import CategoriesComponent from "../components/categories";
+import SignIn from "./sign_in";
 
 
 const Categories = (props) => {
     if (!props.accessToken)
-        return <Error text="Not authorizated"/>
+        return <SignIn setAccessToken={props.setAccessToken}/>
     return <CategoriesComponent accessToken={props.accessToken}/>
 }
 

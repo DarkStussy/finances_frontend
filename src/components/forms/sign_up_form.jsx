@@ -29,10 +29,10 @@ const SignUpForm = () => {
         <p>5. At least 8 characters in length, but no more than 32.</p>
     </Form.Text>
 
-    let [input, setInput] = useState({
+    const [input, setInput] = useState({
         username: "", password: "", confirm_password: ""
     });
-    let [error, setError] = useState({username: "", password: "", confirm_password: "", detail: ""});
+    const [error, setError] = useState({username: "", password: "", confirm_password: "", detail: ""});
 
     const validateInput = e => {
         let {name, value} = e.target;
@@ -100,7 +100,7 @@ const SignUpForm = () => {
 
     const onInputChange = getInputChangeFunc(setInput, validateInput);
     return (
-        <Form onSubmit={onSubmit} id="signup_form" className="p-5 m-auto form">
+        <Form onSubmit={onSubmit} id="signup_form" className="p-4 m-auto form">
             {errorInput(error.username)}
             <UsernameInput onChange={onInputChange} username_text={username_text}/>
             {errorInput(error.password)}

@@ -4,7 +4,7 @@ import CreatableSelect from "react-select/creatable";
 
 const TransactionForm = ({type, onSubmit, onInputChange, ...props}) => {
     return (
-        <Form onSubmit={onSubmit} className="p-5 m-auto form">
+        <Form onSubmit={onSubmit} className="p-4 m-auto form">
             <Form.Group className="mb-3">
                 <Form.Control onChange={onInputChange}
                               type="datetime-local" value={props.transactionCreated} name="transactionCreated"
@@ -40,6 +40,7 @@ const TransactionForm = ({type, onSubmit, onInputChange, ...props}) => {
             </Form.Group>
             <Form.Group className="mb-4">
                 <Form.Control onChange={onInputChange}
+                              autoComplete="off"
                               type="text" name="transactionAmount" placeholder="Amount"
                               value={props.transactionAmount}
                               maxLength={17}

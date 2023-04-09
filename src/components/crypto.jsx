@@ -4,16 +4,17 @@ import {sendAPIRequest, sendAPIRequestWithBody} from "../functions/requests";
 import {components} from "react-select";
 import CreatableSelect from "react-select/creatable";
 import {getInputChangeFunc, getSelectChangeFunc} from "../functions/input_change";
-import {InfinitySpin} from "react-loader-spinner";
 import CryptoTransactionFormModal from "./forms/crypto_transaction_form_modal";
 import {getISODatetime} from "../functions/periods";
+import {useNavigate} from "react-router-dom";
+import InfinitySpinContainer from "./infinity_spin";
+import {validateAddTransactionInput} from "../functions/crypto_transaction";
 
 const CryptoComponent = (props) => {
     const [isLoading, setIsLoading] = useState(true);
     const [portfolioData, setPortfolioData] = useState({
         portfolio: null,
-        total: 0,
-        reload: false
+        total: 0
     });
     const [portfolios, setPortfolios] = useState([]);
     const [assets, setAssets] = useState({list: [], prices: {}});
@@ -35,14 +36,9 @@ const CryptoComponent = (props) => {
         const getAndSetPortfoliosData = async () => {
             const portfolios = await sendAPIRequest(props.accessToken, "/cryptoportfolio/all", "GET");
             setPortfolios(portfolios);
-            setPortfolioData(prevState => ({
-                portfolio: prevState.portfolio,
-                total: prevState.total,
-                reload: false
-            }));
         };
         getAndSetPortfoliosData().catch(console.error);
-    }, [portfolioData.reload, props.accessToken]);
+    }, [isLoading, props.accessToken]);
 
     useEffect(() => {
             const getAndSetPortfolioData = async () => {
@@ -50,8 +46,7 @@ const CryptoComponent = (props) => {
                 if (!portfolio.detail) {
                     setPortfolioData(prevState => ({
                         portfolio: {label: portfolio["title"], value: portfolio, type: "portfolio"},
-                        total: prevState.total,
-                        reload: false
+                        total: prevState.total
                     }));
                     setInput(prevState => ({
                         type: prevState.type,
@@ -61,8 +56,6 @@ const CryptoComponent = (props) => {
                         transactionCreated: prevState.transactionCreated,
                         portfolioTitle: portfolio.title
                     }));
-                } else {
-                    setIsLoading(false);
                 }
             };
             getAndSetPortfolioData().catch(console.error);
@@ -80,14 +73,9 @@ const CryptoComponent = (props) => {
                 setAssets(prevState => ({list: assets, prices: prevState.prices}));
                 if (assets.length === 0) setIsLoading(false);
             }
-            setPortfolioData(prevState => ({
-                portfolio: prevState.portfolio,
-                total: prevState.total,
-                reload: false
-            }));
         };
         getAndSetCryptoAssets().catch(console.error);
-    }, [portfolioData.portfolio, portfolioData.reload, props.accessToken]);
+    }, [isLoading, portfolioData.portfolio, props.accessToken]);
 
     useEffect(() => {
         if (assets.list.length === 0) return;
@@ -111,18 +99,13 @@ const CryptoComponent = (props) => {
 
         fetchPrices().then(() => {
             setIsLoading(false);
-            setPortfolioData(prevState => ({
-                portfolio: prevState.portfolio,
-                total: prevState.total,
-                reload: false
-            }));
         }).catch(console.error);
         const intervalId = setInterval(fetchPrices, 5000);
 
         return () => {
             clearInterval(intervalId);
         };
-    }, [portfolioData.reload, assets.list, props.accessToken]);
+    }, [assets.list, props.accessToken]);
     useEffect(() => {
         if (!portfolioData.portfolio) return;
         const fetchTotalByPortfolio = async () => {
@@ -133,8 +116,7 @@ const CryptoComponent = (props) => {
                 "GET", queryParams);
             setPortfolioData(prevState => ({
                 portfolio: prevState.portfolio,
-                total: totalResponse["total"] || 0,
-                reload: prevState.reload
+                total: totalResponse["total"] || 0
             }));
         };
         fetchTotalByPortfolio().catch(console.error);
@@ -143,7 +125,7 @@ const CryptoComponent = (props) => {
         return () => {
             clearInterval(intervalId);
         };
-    }, [portfolioData.portfolio, props.accessToken]);
+    }, [isLoading, portfolioData.portfolio, props.accessToken]);
 
 
     const portfoliosOptions = portfolios.map(portfolio => {
@@ -166,29 +148,30 @@ const CryptoComponent = (props) => {
         }));
     };
     const onCreatePortfolio = async (title) => {
-        setIsLoading(true);
         const body = JSON.stringify({
             "title": title
         });
         const newPortfolio = await sendAPIRequestWithBody(props.accessToken, '/cryptoportfolio/add', body);
-        if (newPortfolio.detail) {
-            setIsLoading(false);
-            return;
-        }
-
+        if (newPortfolio.detail) return;
+        setIsLoading(true);
+        const portfolioTitle = newPortfolio["title"];
         setPortfolioData(prevState => ({
-            portfolio: {label: newPortfolio["title"], value: newPortfolio, type: "portfolio"},
-            total: prevState.total,
-            reload: true
+            portfolio: {label: portfolioTitle, value: newPortfolio, type: "portfolio"},
+            total: prevState.total
+        }));
+        setInput(prevState => ({
+            ...prevState,
+            portfolioTitle: portfolioTitle
         }));
     };
-
+    const navigate = useNavigate();
     const assetsRows = assets.list.map(asset => {
         const code = asset["crypto_currency"]["code"];
         const price = assets.prices[code];
         const amount = asset["amount"]
         return (
-            <tr key={code}>
+            <tr key={code} onClick={() => navigate('/cryptoAsset', {state: {cryptoAssetID: asset["id"]}})}
+                style={{cursor: "pointer"}} className="table-text crypto-transaction-row">
                 <td className="text-start m-auto"><b>{asset["crypto_currency"]["name"]}</b></td>
                 <td className="text-center">
                     {amount}
@@ -259,36 +242,7 @@ const CryptoComponent = (props) => {
     const onSubmitAddTransaction = e => {
         e.preventDefault();
 
-        let isError = false;
-        if (input.transactionAmount <= 0) {
-            setError(prevState => ({
-                add: prevState.add,
-                price: prevState.price,
-                amount: "Amount must be greater than 0"
-            }));
-            isError = true;
-        } else {
-            setError(prevState => ({
-                add: prevState.add,
-                price: prevState.price,
-                amount: ""
-            }));
-        }
-        if (input.currencyPrice <= 0) {
-            setError(prevState => ({
-                add: prevState.add,
-                amount: prevState.amount,
-                price: "Price must be greater than 0"
-            }));
-            isError = true;
-        } else {
-            setError(prevState => ({
-                add: prevState.add,
-                amount: prevState.amount,
-                price: ""
-            }));
-        }
-
+        const isError = validateAddTransactionInput(input.transactionAmount, input.currencyPrice, setError);
         if (isError) return;
 
         const addTransaction = async () => {
@@ -296,7 +250,7 @@ const CryptoComponent = (props) => {
                 {
                     "type": input.type,
                     "amount": parseFloat(input.transactionAmount),
-                    "price": parseFloat(input.transactionAmount),
+                    "price": parseFloat(input.currencyPrice),
                     "created": input.transactionCreated,
                     "portfolio_id": portfolioData.portfolio.value.id,
                     "crypto_currency_id": input.cryptocurrency.value.id
@@ -309,7 +263,6 @@ const CryptoComponent = (props) => {
             } else {
                 hideAddTransactionModal();
                 clearInput();
-                setPortfolioData({...portfolioData, reload: true});
                 setIsLoading(true);
             }
         };
@@ -326,9 +279,8 @@ const CryptoComponent = (props) => {
             if (!portfolio.detail) {
                 const portfolioTitle = portfolio["title"];
                 setPortfolioData({
-                    ...portfolioData,
-                    portfolio: {label: portfolioTitle, value: portfolio, type: "portfolio"},
-                    reload: true
+                    total: portfolioData.total,
+                    portfolio: {label: portfolioTitle, value: portfolio, type: "portfolio"}
                 });
                 setInput({...input, portfolioTitle: portfolioTitle});
                 setIsLoading(true);
@@ -357,26 +309,24 @@ const CryptoComponent = (props) => {
                 </Col>
                 <Col sm={4} className="mt-3 align-content-center">
                     <h5>Balance: <span
-                        style={{fontVariantNumeric: 'tabular-nums'}}>{portfolioData.total.toFixed(2)}</span> USD
+                        style={{fontVariantNumeric: 'tabular-nums'}}>{portfolioData.total.toFixed(2)}</span> $
                     </h5>
                 </Col>
                 <Col sm={4} className="mt-2">
                     <ButtonGroup className="ms-2">
-                        <Button onClick={showEditPortfolioModal} className="text-white btn-sm"
-                                variant="outline-secondary">Edit</Button>
-                        <Button className="text-white btn-sm" variant="outline-secondary"
-                                onClick={showAddTransactionModal}>Add transaction</Button>
+                        <Button onClick={showEditPortfolioModal} className="text-white fw-bold" size="sm"
+                                variant="outline-secondary" active={showEditPortfolio}>Edit</Button>
+                        <Button className="text-white fw-bold" variant="outline-secondary" size="sm"
+                                onClick={showAddTransactionModal} active={showAddTransaction}>Add transaction</Button>
                     </ButtonGroup>
                 </Col>
             </Row>
             {(isLoading) ? (
-                <Container className="mt-5 d-flex justify-content-center align-items-center">
-                    <InfinitySpin color="grey"/>
-                </Container>
+                <InfinitySpinContainer marginTop="8rem"/>
             ) : (
                 <Table responsive hover className="mt-5" variant="dark">
                     <thead>
-                    <tr>
+                    <tr className="table-text crypto-transaction-row">
                         <td className="text-start">Asset</td>
                         <td className="text-center">Balance</td>
                         <td className="text-center">Price</td>

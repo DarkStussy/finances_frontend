@@ -20,13 +20,14 @@ import ChangeTransaction from "./pages/change_transaction";
 import Categories from "./pages/categories";
 import FiatStats from "./pages/fiat_stats";
 import Crypto from "./pages/crypto";
+import CryptoAsset from "./pages/crypto_asset";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
 
 const App = () => {
     const {accessToken, setAccessToken} = useAccessToken();
-    let [baseCurrency, setBaseCurrencyState] = useState({
+    const [baseCurrency, setBaseCurrencyState] = useState({
         currencyCode: "USD"
     });
     useEffect(() => {
@@ -52,21 +53,28 @@ const App = () => {
                     <Route path={'/changePassword'} element={<ChangePassword accessToken={accessToken}/>}/>
 
                     {/* fiat */}
-                    <Route path={'/assets'} element={<Assets accessToken={accessToken} baseCurrency={baseCurrency}
+                    <Route path={'/assets'} element={<Assets accessToken={accessToken} setAccessToken={setAccessToken}
+                                                             baseCurrency={baseCurrency}
                                                              setBaseCurrencyState={setBaseCurrencyState}/>}/>
                     <Route path={'/asset'} element={<Asset accessToken={accessToken}/>}/>
                     <Route path={'/addAsset'} element={<AddAsset accessToken={accessToken}/>}/>
                     <Route path={'/changeAsset'} element={<ChangeAsset accessToken={accessToken}/>}/>
                     <Route path={'/transactions'}
-                           element={<Transactions accessToken={accessToken} baseCurrency={baseCurrency}/>}/>
+                           element={<Transactions accessToken={accessToken} setAccessToken={setAccessToken}
+                                                  baseCurrency={baseCurrency}/>}/>
                     <Route path={'/addTransaction'} element={<AddTransaction accessToken={accessToken}/>}/>
                     <Route path={'/changeTransaction'} element={<ChangeTransaction accessToken={accessToken}/>}/>
-                    <Route path={'/categories'} element={<Categories accessToken={accessToken}/>}/>
+                    <Route path={'/categories'}
+                           element={<Categories accessToken={accessToken} setAccessToken={setAccessToken}/>}/>
                     <Route path={'/fiatStats'}
-                           element={<FiatStats accessToken={accessToken} baseCurrency={baseCurrency}/>}/>
+                           element={<FiatStats accessToken={accessToken} setAccessToken={setAccessToken}
+                                               baseCurrency={baseCurrency}/>}/>
 
                     {/* crypto */}
-                    <Route path={'/crypto'} element={<Crypto accessToken={accessToken}/>}/>
+                    <Route path={'/crypto'}
+                           element={<Crypto accessToken={accessToken} setAccessToken={setAccessToken}/>}/>
+                    <Route path={'/cryptoAsset'}
+                           element={<CryptoAsset accessToken={accessToken} setAccessToken={setAccessToken}/>}/>
                 </Routes>
             </main>
             <Footer/>

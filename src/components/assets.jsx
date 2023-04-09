@@ -4,11 +4,13 @@ import {useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {getAssets, getTotalAssets} from "../functions/asset";
+import InfinitySpinContainer from "./infinity_spin";
 
 
 const AssetsComponent = (props) => {
-    let [assets, setAssets] = useState([]);
-    let [total, setTotal] = useState({amount: 0, color: "white"});
+    const [isLoading, setIsLoading] = useState(true);
+    const [assets, setAssets] = useState([]);
+    const [total, setTotal] = useState({amount: 0, color: "white"});
     useEffect(() => {
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
@@ -31,10 +33,10 @@ const AssetsComponent = (props) => {
                     if (result.status === "rejected")
                         console.error(result.reason);
                 }));
-
+            setTimeout(() => setIsLoading(false), 500);
         }
         fetchData().catch(console.error);
-    }, [props.accessToken, props.baseCurrency.currencyCode]);
+    }, [isLoading, props.accessToken, props.baseCurrency.currencyCode]);
     const navigate = useNavigate();
     const assetsRows = assets.map((asset) => {
         const currency_code = asset["currency"] ? asset["currency"]["code"] : "USD";
@@ -45,7 +47,7 @@ const AssetsComponent = (props) => {
             <tr onClick={(e) => {
                 e.preventDefault();
                 navigate('/asset', {state: {assetID}});
-            }} key={assetID}>
+            }} key={assetID} className="table-text crypto-transaction-row">
                 <td colSpan={2}>{asset["title"]}</td>
                 <td colSpan={2} style={{color: amountColor}}>{asset["amount"]} {currency_code}</td>
             </tr>
@@ -62,17 +64,22 @@ const AssetsComponent = (props) => {
                     icon={faPlus}
                     size="xl"/>
             </div>
-            <Table className="text-center mt-3" hover variant="dark">
-                <tbody>
-                {assetsRows}
-                </tbody>
-                <tfoot>
-                <tr id="assetsFooter">
-                    <td colSpan={2} className="fw-bold">Total</td>
-                    <td colSpan={2} style={{color: total.color}}>{total.amount} {props.baseCurrency.currencyCode}</td>
-                </tr>
-                </tfoot>
-            </Table>
+            {(isLoading) ? (
+                <InfinitySpinContainer marginTop="8rem"/>
+            ) : (
+                <Table className="text-center mt-3" hover variant="dark">
+                    <tbody>
+                    {assetsRows}
+                    </tbody>
+                    <tfoot>
+                    <tr id="assetsFooter" className="table-text crypto-transaction-row">
+                        <td colSpan={2} className="fw-bold">Total</td>
+                        <td colSpan={2}
+                            style={{color: total.color}}>{total.amount} {props.baseCurrency.currencyCode}</td>
+                    </tr>
+                    </tfoot>
+                </Table>
+            )}
         </Container>
     );
 }

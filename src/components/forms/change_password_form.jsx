@@ -16,10 +16,10 @@ const ChangePasswordForm = (props) => {
         <p>5. At least 8 characters in length, but no more than 32.</p>
     </Form.Text>
 
-    let [input, setInput] = useState({
+    const [input, setInput] = useState({
         password: "", confirm_password: ""
     });
-    let [error, setError] = useState({password: "", confirm_password: "", alert: "", msg: ""});
+    const [error, setError] = useState({password: "", confirm_password: "", alert: "", msg: ""});
 
     const validateInput = e => {
         let {name, value} = e.target;
@@ -80,7 +80,7 @@ const ChangePasswordForm = (props) => {
             .catch(error => console.error(error));
     }
 
-    let [show, setShow] = useState(false);
+    const [show, setShow] = useState(false);
     const getAlert = () => {
         return <BaseAlert show={show} setShow={setShow} className="mb-3" type={error.alert}
                           alert_text={error.msg}/>;
@@ -90,7 +90,7 @@ const ChangePasswordForm = (props) => {
     return (
         <>
             {getAlert()}
-            <Form onSubmit={onSubmit} className="p-5 m-auto form">
+            <Form onSubmit={onSubmit} className="p-4 m-auto form">
                 {errorInput(error.password)}
                 <PasswordInput value={input.password} onChange={onInputChange} password_text={password_text}/>
                 {errorInput(error.confirm_password)}

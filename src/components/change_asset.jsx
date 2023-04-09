@@ -8,14 +8,14 @@ import {getInputChangeFunc} from "../functions/input_change";
 import {useNavigate} from "react-router-dom";
 
 const ChangeAssetComponent = (props) => {
-    let [changedAsset, setChangedAsset] = useState({
+    const [changedAsset, setChangedAsset] = useState({
         id: props.assetID,
         currency: {},
         assetTitle: "",
         assetAmount: ""
     });
-    let [currencies, setCurrencies] = useState([]);
-    let [showAlert, setShowAlert] = useState(
+    const [currencies, setCurrencies] = useState([]);
+    const [showAlert, setShowAlert] = useState(
         {alertType: "", msg: "", show: false});
     useEffect(() => {
         const getAndSetAssetData = async () => {
@@ -132,7 +132,7 @@ const ChangeAssetComponent = (props) => {
     );
 
     return (
-        <Container className="p-5 text-center">
+        <Container className="p-4 text-center">
             <BaseAlert type={showAlert.alertType} alert_text={showAlert.msg} show={showAlert.show} setShow={setShow}/>
             <h2 className="mt-2">Change asset</h2>
             <AssetForm type="Change" onClickBack={onClickBack} onSubmit={onSubmit} onInputChange={onInputChange}

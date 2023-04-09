@@ -12,28 +12,29 @@ import {
 import BaseAlert from "./alert";
 import {addTransaction, getAssetOptions, typesOptions} from "../functions/transaction";
 import {getISODatetime} from "../functions/periods";
-
+import InfinitySpinContainer from "./infinity_spin";
 
 const AddTransactionComponent = (props) => {
     let asset = null;
     if (props.asset) {
         asset = {label: props.asset.title, value: props.asset, type: "asset"};
     }
-
-    let [requestData, setRequestData] = useState({assets: [], categories: []});
-    let [input, setInput] = useState({
+    const [isLoading, setIsLoading] = useState(true);
+    const [requestData, setRequestData] = useState({assets: [], categories: []});
+    const [input, setInput] = useState({
         asset: asset, transactionType: null, category: null,
         transactionAmount: "", transactionCreated: getISODatetime(new Date())
     });
-    let [showAlert, setShowAlert] = useState(
+    const [showAlert, setShowAlert] = useState(
         {msg: "", show: false});
     useEffect(() => {
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
             setRequestData(prevState => ({categories: prevState.categories, assets: assets}));
+            setTimeout(() => setIsLoading(false), 500);
         };
         getAndSetAssetsData().catch(console.error);
-    }, [props.accessToken]);
+    }, [isLoading, props.accessToken]);
     useEffect(() => {
         if (input.transactionType === null) return;
         setInput(prevState => ({
@@ -96,25 +97,30 @@ const AddTransactionComponent = (props) => {
     };
 
     return (
-        <Container className="p-5 text-center">
+        <Container className="p-4 text-center">
             <BaseAlert type="danger" alert_text={showAlert.msg} show={showAlert.show} setShow={setShow}/>
-            <h2 className="mt-2">Add transaction</h2>
-            <TransactionForm
-                type="Add"
-                onSubmit={onSubmit} onChangeSelect={onChangeSelect}
-                onCreateOption={onCreateOption}
-                onInputChange={onInputChange}
-                onClickBack={onClickBack}
-                asset={input.asset}
-                transactionType={input.transactionType}
-                category={input.category}
-                transactionAmount={input.transactionAmount}
-                assetsOptions={assetsOptions}
-                typesOptions={typesOptions}
-                categoriesOptions={categoriesOptions}
-                transactionCreated={input.transactionCreated}
-                disabledSubmit={!(input.asset && input.transactionType && input.category && input.transactionAmount && input.transactionCreated)}
-            />
+            <h2 className="p-2">Add transaction</h2>
+            {(isLoading) ? (
+                <InfinitySpinContainer marginTop="8rem"/>
+            ) : (
+                <TransactionForm
+                    type="Add"
+                    onSubmit={onSubmit} onChangeSelect={onChangeSelect}
+                    onCreateOption={onCreateOption}
+                    onInputChange={onInputChange}
+                    onClickBack={onClickBack}
+                    asset={input.asset}
+                    transactionType={input.transactionType}
+                    category={input.category}
+                    transactionAmount={input.transactionAmount}
+                    assetsOptions={assetsOptions}
+                    typesOptions={typesOptions}
+                    categoriesOptions={categoriesOptions}
+                    transactionCreated={input.transactionCreated}
+                    disabledSubmit={!(input.asset && input.transactionType && input.category && input.transactionAmount && input.transactionCreated)}
+                />
+            )}
+
         </Container>
     );
 }

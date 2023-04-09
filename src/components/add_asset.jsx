@@ -6,19 +6,22 @@ import {getInputChangeFunc} from "../functions/input_change";
 import BaseAlert from "./alert";
 import {addAsset} from "../functions/asset";
 import {useNavigate} from "react-router-dom";
+import InfinitySpinContainer from "./infinity_spin";
 
 const AddAssetComponent = (props) => {
-    let [currencies, setCurrencies] = useState([]);
-    let [input, setInput] = useState({currency: null, assetTitle: "", assetAmount: ""});
-    let [showAlert, setShowAlert] = useState({alertType: "", msg: "", show: false});
+    const [isLoading, setIsLoading] = useState(true);
+    const [currencies, setCurrencies] = useState([]);
+    const [input, setInput] = useState({currency: null, assetTitle: "", assetAmount: ""});
+    const [showAlert, setShowAlert] = useState({alertType: "", msg: "", show: false});
     useEffect(() => {
         const getAndSetCurrencies = async () => {
             const currencies = await getAllCurrencies(props.accessToken, "default");
             if (!currencies.detail)
                 setCurrencies(currencies);
+            setTimeout(() => setIsLoading(false), 500);
         }
         getAndSetCurrencies().catch(console.error);
-    }, [props.accessToken]);
+    }, [isLoading, props.accessToken]);
 
     const currenciesOptions = currencies.map((currency) => {
         const currencyCode = currency["code"];
@@ -68,15 +71,20 @@ const AddAssetComponent = (props) => {
         navigate('/assets');
     }
     return (
-        <Container className="p-5 text-center">
+        <Container className="p-4 text-center">
             <BaseAlert type={showAlert.alertType} alert_text={showAlert.msg} show={showAlert.show} setShow={setShow}/>
             <h2 className="mt-2">Add asset</h2>
-            <AssetForm type="Add" onClickBack={onClickBack} onSubmit={onSubmit} onInputChange={onInputChange} onCurrencySelectChange={onCurrencySelectChange}
-                       currenciesOptions={currenciesOptions}
-                       currencyOption={input.currency}
-                       assetTitle={input.assetTitle}
-                       assetAmount={input.assetAmount}
-            />
+            {(isLoading) ? (
+                <InfinitySpinContainer marginTop="8rem"/>
+            ) : (
+                <AssetForm type="Add" onClickBack={onClickBack} onSubmit={onSubmit} onInputChange={onInputChange}
+                           onCurrencySelectChange={onCurrencySelectChange}
+                           currenciesOptions={currenciesOptions}
+                           currencyOption={input.currency}
+                           assetTitle={input.assetTitle}
+                           assetAmount={input.assetAmount}
+                />
+            )}
         </Container>
     );
 }

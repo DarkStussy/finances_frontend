@@ -10,17 +10,18 @@ import {
 import {getInputChangeFunc, getSelectChangeFunc} from "../functions/input_change";
 import Select from "react-select";
 import {typesOptions} from "../functions/transaction";
+import InfinitySpinContainer from "./infinity_spin";
 
 const CategoriesComponent = (props) => {
-    let [categories, setCategories] = useState({
-        type: 'income', list: [],
-        reload: false
+    const [isLoading, setIsLoading] = useState(true);
+    const [categories, setCategories] = useState({
+        type: 'income', list: []
     });
-    let [selectedCategory, setSelectedCategory] = useState({});
-    let [showAddModal, setShowAddModal] = useState(false);
-    let [showEditModal, setShowEditModal] = useState(false);
-    let [showDeleteModal, setShowDeleteModal] = useState(false);
-    let [input, setInput] = useState({
+    const [selectedCategory, setSelectedCategory] = useState({});
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [input, setInput] = useState({
         categoryTitle: "",
         transactionType: ""
     });
@@ -28,10 +29,11 @@ const CategoriesComponent = (props) => {
         const getAndSetTransactionCategoriesData = async () => {
             const response = await getAllTransactionCategories(props.accessToken, categories.type)
             setCategories(prevState => (
-                {type: prevState.type, list: response, reload: false}));
+                {type: prevState.type, list: response}));
+            setTimeout(() => setIsLoading(false), 500);
         };
         getAndSetTransactionCategoriesData().catch(console.error);
-    }, [categories.reload, categories.type, props.accessToken]);
+    }, [isLoading, categories.type, props.accessToken]);
 
     const handleCloseAddModal = () => setShowAddModal(false);
     const handleShowAddModal = () => {
@@ -72,7 +74,10 @@ const CategoriesComponent = (props) => {
 
     const onChangeTransactionType = e => {
         const {name} = e.target;
-        setCategories({type: name, list: categories.list, reload: categories.reload});
+        if (categories.type !== name) {
+            setCategories({type: name, list: categories.list});
+            setIsLoading(true);
+        }
     };
 
     const onChangeCategoryName = getInputChangeFunc(setInput);
@@ -81,7 +86,7 @@ const CategoriesComponent = (props) => {
         e.preventDefault();
         addTransactionCategory(props.accessToken, input.categoryTitle, input.transactionType.value).catch(console.error);
         setInput({categoryTitle: "", transactionType: ""});
-        setCategories({type: input.transactionType.value, list: categories.list, reload: true});
+        setIsLoading(true);
         setShowAddModal(false);
     };
 
@@ -89,14 +94,14 @@ const CategoriesComponent = (props) => {
         e.preventDefault();
         changeTransactionCategory(props.accessToken, selectedCategory.id, input.categoryTitle).catch(console.error);
         setInput({categoryTitle: "", transactionType: ""});
-        setCategories({type: categories.type, list: categories.list, reload: true});
+        setIsLoading(true);
         setShowEditModal(false);
     };
 
     const onDeleteCategory = (e) => {
         e.preventDefault();
         deleteTransactionCategory(props.accessToken, selectedCategory.id).catch(console.error);
-        setCategories({type: categories.type, list: categories.list, reload: true});
+        setIsLoading(true);
         setShowDeleteModal(false);
     };
 
@@ -116,17 +121,19 @@ const CategoriesComponent = (props) => {
                 <ButtonGroup className="w-100">
                     <Button onClick={onChangeTransactionType} active={categories.type === 'income'} name="income"
                             className="bg-gradient"
-                            variant="success">Income</Button>
+                            variant="primary">Income</Button>
                     <Button onClick={onChangeTransactionType} active={categories.type === 'expense'} name="expense"
                             className="bg-gradient"
                             variant="danger">Expense</Button>
                 </ButtonGroup>
             </ButtonToolbar>
-            <Table responsive variant="dark">
-                <tbody>
-                {categoriesList}
-                </tbody>
-            </Table>
+            {(isLoading) ? (<InfinitySpinContainer marginTop="8rem"/>) : (
+                <Table responsive variant="dark">
+                    <tbody>
+                    {categoriesList}
+                    </tbody>
+                </Table>
+            )}
             <Modal centered show={showAddModal} onHide={handleCloseAddModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add category</Modal.Title>

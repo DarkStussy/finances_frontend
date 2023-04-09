@@ -15,6 +15,7 @@ import {
 } from "../functions/transaction_category";
 import {getInputChangeFunc, getSelectChangeFunc} from "../functions/input_change";
 import BaseAlert from "./alert";
+import InfinitySpinContainer from "./infinity_spin";
 
 const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -33,18 +34,20 @@ const ChangeTransactionComponent = (props) => {
         label: props.transaction.category.title,
         value: props.transaction.category, type: "category"
     };
-    let [requestData, setRequestData] = useState({assets: [], categories: []});
-    let [input, setInput] = useState({
+    const [requestData, setRequestData] = useState({assets: [], categories: []});
+    const [input, setInput] = useState({
         asset: asset, transactionType: transactionType, category: category,
         transactionAmount: props.transaction.amount, transactionCreated: props.transaction.created
     });
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         const getAndSetAssetsData = async () => {
             const assets = await getAssets(props.accessToken);
             setRequestData(prevState => ({categories: prevState.categories, assets: assets}));
+            setTimeout(() => setIsLoading(false), 500);
         };
         getAndSetAssetsData().catch(console.error);
-    }, [props.accessToken]);
+    }, [isLoading, props.accessToken]);
     useEffect(() => {
         if (input.transactionType === null) return;
         setInput(prevState => ({
@@ -68,7 +71,7 @@ const ChangeTransactionComponent = (props) => {
     const onChangeSelect = getSelectChangeFunc(setInput);
     const onInputChange = getInputChangeFunc(setInput);
 
-    let [showAlert, setShowAlert] = useState(
+    const [showAlert, setShowAlert] = useState(
         {msg: "", show: false});
     const onCreateOption = getOnCreateCategoryOption(props.accessToken, input.transactionType, setShowAlert,
         setInput);
@@ -147,27 +150,31 @@ const ChangeTransactionComponent = (props) => {
             navigate('/transactions');
     }
     return (
-        <Container className="p-5 text-center">
+        <Container className="p-4 text-center">
             <BaseAlert type="danger" alert_text={showAlert.msg} show={showAlert.show} setShow={setShow}/>
             <h2 className="mt-2">Change transaction</h2>
-            <TransactionForm
-                type="Change"
-                onSubmit={onSubmit}
-                onCreateOption={onCreateOption}
-                onChangeSelect={onChangeSelect}
-                onInputChange={onInputChange}
-                asset={input.asset}
-                transactionType={input.transactionType}
-                category={input.category}
-                transactionAmount={input.transactionAmount}
-                assetsOptions={assetsOptions}
-                typesOptions={typesOptions}
-                categoriesOptions={categoriesOptions}
-                transactionCreated={input.transactionCreated}
-                disabledSubmit={!(input.asset && input.transactionType && input.category && input.transactionAmount && input.transactionCreated)}
-                onClickBack={onClickBack}
-                deleteButton={deleteButton}
-            />
+            {(isLoading) ? (
+                <InfinitySpinContainer marginTop="8rem"/>
+            ) : (
+                <TransactionForm
+                    type="Change"
+                    onSubmit={onSubmit}
+                    onCreateOption={onCreateOption}
+                    onChangeSelect={onChangeSelect}
+                    onInputChange={onInputChange}
+                    asset={input.asset}
+                    transactionType={input.transactionType}
+                    category={input.category}
+                    transactionAmount={input.transactionAmount}
+                    assetsOptions={assetsOptions}
+                    typesOptions={typesOptions}
+                    categoriesOptions={categoriesOptions}
+                    transactionCreated={input.transactionCreated}
+                    disabledSubmit={!(input.asset && input.transactionType && input.category && input.transactionAmount && input.transactionCreated)}
+                    onClickBack={onClickBack}
+                    deleteButton={deleteButton}
+                />
+            )}
         </Container>
     );
 }

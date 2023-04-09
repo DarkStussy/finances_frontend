@@ -6,11 +6,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router-dom";
 import {backOrForwardOneDay} from "../functions/periods";
+import InfinitySpinContainer from "./infinity_spin";
 
 const AssetComponent = (props) => {
-    let [assetTransactions, setAssetTransactions] = useState(
+    const [isLoading, setIsLoading] = useState(true);
+    const [assetTransactions, setAssetTransactions] = useState(
         {totals: {total_income: 0, total_expense: 0}, data: [], asset: {amount: 0}});
-    let [date, setDate] = useState(new Date());
+    const [date, setDate] = useState(new Date());
     useEffect(() => {
         const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
         const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
@@ -38,9 +40,10 @@ const AssetComponent = (props) => {
                     if (result.status === "rejected")
                         console.error(result.reason);
                 }));
+            setTimeout(() => setIsLoading(false), 500);
         }
         fetchData().catch(console.error);
-    }, [date, props.assetID, props.accessToken]);
+    }, [isLoading, date, props.assetID, props.accessToken]);
 
     const navigate = useNavigate();
 
@@ -58,7 +61,7 @@ const AssetComponent = (props) => {
             const transactionID = transaction["id"];
             const amountColor = transaction["category"]["type"] === "income" ? "var(--amount-positive)" :
                 "var(--amount-negative)";
-            return <tr key={transactionID}
+            return <tr key={transactionID} className="table-text crypto-transaction-row"
                        onClick={() => navigate('/changeTransaction', {state: {transaction, fromAsset: true}})}>
                 <td>{transaction["category"]["title"]}</td>
                 <td></td>
@@ -70,7 +73,7 @@ const AssetComponent = (props) => {
             <Table responsive key={data["created"]}
                    className="text-center mt-4 mb-4" hover variant="dark">
                 <thead>
-                <tr>
+                <tr className="table-text crypto-transaction-row">
                     <th className="h6 fw-bold">{new Date(data["created"]).toLocaleDateString('en-US', {
                         day: 'numeric',
                         month: 'short'
@@ -101,41 +104,54 @@ const AssetComponent = (props) => {
 
             <Container className="mt-3 d-flex justify-content-between">
                 <ButtonGroup>
-                    <Button onClick={() => backOrForwardOneDay("back", date, setDate)} className="bg-gradient"
+                    <Button onClick={() => {
+                        backOrForwardOneDay("back", date, setDate);
+                        setIsLoading(true);
+                    }} className="bg-gradient fw-bold text-white btn-controls"
                             variant="outline-secondary">&lt;</Button>
-                    <Button className="bg-gradient text-white"
+                    <Button className="bg-gradient text-white fw-bold btn-controls"
                             variant="outline-secondary">{date.toLocaleDateString('en-US', {
                         month: 'short',
                         year: 'numeric'
                     })}</Button>
-                    <Button onClick={() => backOrForwardOneDay("next", date, setDate)} className="bg-gradient"
+                    <Button onClick={() => {
+                        backOrForwardOneDay("next", date, setDate);
+                        setIsLoading(true);
+                    }} className="bg-gradient fw-bold text-white btn-controls"
                             variant="outline-secondary">&gt;</Button>
                 </ButtonGroup>
                 <ButtonGroup>
                     <Button onClick={() => navigate('/addTransaction', {state: {asset: assetTransactions.asset}})}
-                            variant="outline-secondary text-white">Add transaction</Button>
+                            variant="outline-secondary text-white fw-bold btn-controls">Add transaction</Button>
                 </ButtonGroup>
             </Container>
-            <Table responsive
-                   className="text-center mt-4 mb-4" variant="dark">
-                <thead>
-                <tr>
-                    <th>Income</th>
-                    <th>Expense</th>
-                    <th>Total</th>
-                    <th>Balance</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td style={{color: "var(--amount-positive)"}}>{assetTransactions.totals.total_income.toFixed(2)}</td>
-                    <td style={{color: "var(--amount-negative)"}}>{assetTransactions.totals.total_expense.toFixed(2)}</td>
-                    <td>{(assetTransactions.totals.total_income - assetTransactions.totals.total_expense).toFixed(2)}</td>
-                    <td style={{color: "lightgrey"}}>{assetTransactions.asset.amount.toFixed(2)}</td>
-                </tr>
-                </tbody>
-            </Table>
-            {assetTransactionsRows}
+
+            {(isLoading) ? (
+                <InfinitySpinContainer marginTop="8rem"/>
+            ) : (
+                <>
+                    <Table responsive
+                           className="text-center mt-4 mb-4" variant="dark">
+                        <thead>
+                        <tr className="table-text crypto-transaction-row">
+                            <th>Income</th>
+                            <th>Expense</th>
+                            <th>Total</th>
+                            <th>Balance</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr className="table-text crypto-transaction-row">
+                            <td style={{color: "var(--amount-positive)"}}>{assetTransactions.totals.total_income.toFixed(2)}</td>
+                            <td style={{color: "var(--amount-negative)"}}>{assetTransactions.totals.total_expense.toFixed(2)}</td>
+                            <td>{(assetTransactions.totals.total_income - assetTransactions.totals.total_expense).toFixed(2)}</td>
+                            <td style={{color: "lightgrey"}}>{assetTransactions.asset.amount.toFixed(2)}</td>
+                        </tr>
+                        </tbody>
+                    </Table>
+                    {assetTransactionsRows}
+                </>
+            )}
         </Container>
     );
 };

@@ -7,16 +7,18 @@ import {getSelectChangeFunc} from "../functions/input_change";
 import {getTotalCategoriesByPeriod} from "../functions/totals";
 import {Pie} from "react-chartjs-2";
 import {generateColors} from "../functions/get_colors";
+import InfinitySpinContainer from "./infinity_spin";
 
 ChartJS.register(ArcElement, Tooltip);
 
 const FiatStatsComponent = (props) => {
-    let [options, setOptions] = useState({
+    const [isLoading, setIsLoading] = useState(true);
+    const [options, setOptions] = useState({
         fiatStatsType: fiatStatsOptions[1],
         date: new Date(),
         type: "income"
     });
-    let [totalCategories, setTotalCategories] = useState({total: 0, list: []});
+    const [totalCategories, setTotalCategories] = useState({total: 0, list: []});
     useEffect(() => {
         const setData = (startDate, endDate) => {
             getTotalCategoriesByPeriod(props.accessToken, startDate, endDate, options.type).then(data => {
@@ -49,7 +51,8 @@ const FiatStatsComponent = (props) => {
             default:
                 break;
         }
-    }, [props.baseCurrency.currencyCode, options.date, options.fiatStatsType, options.type, props.accessToken]);
+        setTimeout(() => setIsLoading(false), 500);
+    }, [isLoading, props.baseCurrency.currencyCode, options.date, options.fiatStatsType, options.type, props.accessToken]);
     const getSliderValue = () => {
         let value;
         switch (options.fiatStatsType.value) {
@@ -74,7 +77,10 @@ const FiatStatsComponent = (props) => {
         }
         return value;
     }
-    const onChangePeriodType = getSelectChangeFunc(setOptions);
+    const onChangePeriodType = (option) => {
+        setIsLoading(true);
+        getSelectChangeFunc(setOptions)(option);
+    };
     const onChangeTransactionType = e => {
         const {name} = e.target;
         setOptions(prevState => ({
@@ -82,6 +88,7 @@ const FiatStatsComponent = (props) => {
             date: prevState.date,
             type: name
         }));
+        setIsLoading(true);
     };
     const backOrForwardPeriod = (type) => {
         return () => {
@@ -123,6 +130,7 @@ const FiatStatsComponent = (props) => {
                 default:
                     break;
             }
+            setIsLoading(true);
         }
     };
     const colors = generateColors(totalCategories.list.length);
@@ -156,7 +164,7 @@ const FiatStatsComponent = (props) => {
         data.datasets[0].data.push(total);
         data.datasets[1].data.push(percentage);
         totalCategoriesRows.push(
-            <tr key={title}>
+            <tr key={title} className="table-text crypto-transaction-row">
                 <td colSpan={1} className="text-start">{title}</td>
                 <td colSpan={1} className="text-center">
                     <span className="percentage-badge fw-bold"
@@ -176,22 +184,24 @@ const FiatStatsComponent = (props) => {
         <Row className="mt-4 text-center justify-content-md-center">
             <Col className="m-auto">
                 <ButtonGroup className="p-1">
-                    <Button onClick={backOrForwardPeriod("back")} className="bg-gradient"
+                    <Button onClick={backOrForwardPeriod("back")}
+                            className="bg-gradient fw-bold text-white btn-controls"
                             variant="outline-secondary">&lt;</Button>
                     <Button className="bg-gradient text-white"
-                            variant="outline-secondary"><small>{getSliderValue()}</small></Button>
-                    <Button onClick={backOrForwardPeriod("forward")} className="bg-gradient"
+                            variant="outline-secondary fw-bold btn-controls"><small>{getSliderValue()}</small></Button>
+                    <Button onClick={backOrForwardPeriod("forward")}
+                            className="bg-gradient fw-bold text-white btn-controls"
                             variant="outline-secondary">&gt;</Button>
                 </ButtonGroup>
             </Col>
             <Col className="m-auto">
                 <ButtonGroup className="p-1">
                     <Button name="income"
-                            className="bg-gradient"
-                            variant="success" onClick={onChangeTransactionType}
+                            className="bg-gradient btn-controls"
+                            variant="primary" onClick={onChangeTransactionType}
                             active={options.type === 'income'}>Income</Button>
                     <Button name="expense"
-                            className="bg-gradient"
+                            className="bg-gradient btn-controls"
                             variant="danger" onClick={onChangeTransactionType}
                             active={options.type === 'expense'}>Expense</Button>
                 </ButtonGroup>
@@ -204,23 +214,30 @@ const FiatStatsComponent = (props) => {
                         options={fiatStatsOptions}/>
             </Col>
         </Row>
-        <Container className="w-50 h-50">
-            {pie}
-        </Container>
-        <Container className="total-categories p-4">
-            <Table responsive variant="dark">
-                <thead>
-                <tr>
-                    <td colSpan={1} className="text-start">Category</td>
-                    <td colSpan={1} className="text-center">%</td>
-                    <td colSpan={1} className="text-end">Total {props.baseCurrency.currencyCode}</td>
-                </tr>
-                </thead>
-                <tbody>
-                {totalCategoriesRows}
-                </tbody>
-            </Table>
-        </Container>
+        {(isLoading) ? (
+            <InfinitySpinContainer marginTop="8rem"/>
+        ) : (
+            <>
+                <Container className="w-50 h-50">
+                    {pie}
+                </Container>
+                <Container className="total-categories p-4">
+                    <Table responsive variant="dark">
+                        <thead>
+                        <tr className="table-text crypto-transaction-row">
+                            <td colSpan={1} className="text-start">Category</td>
+                            <td colSpan={1} className="text-center">%</td>
+                            <td colSpan={1} className="text-end">Total {props.baseCurrency.currencyCode}</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {totalCategoriesRows}
+                        </tbody>
+                    </Table>
+                </Container>
+            </>
+        )}
+
     </Container>
 };
 
