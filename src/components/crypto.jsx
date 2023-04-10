@@ -57,6 +57,8 @@ const CryptoComponent = (props) => {
                         transactionCreated: prevState.transactionCreated,
                         portfolioTitle: portfolio.title
                     }));
+                } else {
+                    setIsLoading(false);
                 }
             };
             getAndSetPortfolioData().catch(console.error);
