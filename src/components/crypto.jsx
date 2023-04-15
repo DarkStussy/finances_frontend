@@ -387,7 +387,7 @@ const CryptoComponent = (props) => {
                 </Stack>
             </Container>
             {(isLoading) ? (
-                <InfinitySpinContainer marginTop="8rem"/>
+                <InfinitySpinContainer marginTop="6rem"/>
             ) : (
                 <Table responsive hover className="mt-4" variant="dark">
                     <thead>

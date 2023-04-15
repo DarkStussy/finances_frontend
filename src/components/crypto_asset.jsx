@@ -337,7 +337,7 @@ const CryptoAssetComponent = (props) => {
                             variant="outline-secondary" active={showCryptoTransactionForm}>Add transaction</Button>
                 </div>
             </Container>
-            {(isLoading) ? (<InfinitySpinContainer marginTop="8rem"/>) : (
+            {(isLoading) ? (<InfinitySpinContainer marginTop="6rem"/>) : (
                 <Table responsive hover className="mt-4" variant="dark">
                     <thead>
                     <tr className="table-text crypto-transaction-row">
