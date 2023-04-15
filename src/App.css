@@ -160,10 +160,17 @@
     .table-response {
         max-width: 75%;
     }
+
+    .portfolio-select {
+        max-width: 60%;
+    }
 }
 
 @media (max-width: 768px) {
     .crypto-transaction td, .btn-controls, .table-text {
         font-size: 14px;
+    }
+    .buttons-portfolio {
+        width: 100%;
     }
 }

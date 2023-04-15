@@ -1,4 +1,4 @@
-import {Badge, Button, ButtonGroup, Col, Container, Form, Modal, Row, Table} from "react-bootstrap";
+import {Badge, Button, ButtonGroup, Col, Container, Form, Modal, Row, Stack, Table} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {sendAPIRequest, sendAPIRequestWithBody} from "../functions/requests";
 import {components} from "react-select";
@@ -14,7 +14,8 @@ const CryptoComponent = (props) => {
     const [isLoading, setIsLoading] = useState(true);
     const [portfolioData, setPortfolioData] = useState({
         portfolio: null,
-        total: 0
+        total: 0,
+        totalsBuy: []
     });
     const [portfolios, setPortfolios] = useState([]);
     const [assets, setAssets] = useState({list: [], prices: {}});
@@ -47,7 +48,8 @@ const CryptoComponent = (props) => {
                 if (!portfolio.detail) {
                     setPortfolioData(prevState => ({
                         portfolio: {label: portfolio["title"], value: portfolio, type: "portfolio"},
-                        total: prevState.total
+                        total: prevState.total,
+                        totalsBuy: prevState.totalsBuy
                     }));
                     setInput(prevState => ({
                         type: prevState.type,
@@ -82,7 +84,22 @@ const CryptoComponent = (props) => {
     }, [isLoading, portfolioData.portfolio, props.accessToken]);
 
     useEffect(() => {
+        if (!portfolioData.portfolio) return;
         if (assets.list.length === 0) return;
+
+        const fetchTotalByPortfolio = async () => {
+            const queryParams = new URLSearchParams({
+                "portfolio_id": portfolioData.portfolio.value.id
+            });
+            const totalResponse = await sendAPIRequest(props.accessToken, "/cryptoportfolio/totalPrice",
+                "GET", queryParams);
+
+            setPortfolioData(prevState => ({
+                portfolio: prevState.portfolio,
+                total: totalResponse["total"] || 0,
+                totalsBuy: totalResponse["totals_buy"] || []
+            }));
+        };
         const fetchPrices = async () => {
             const body = JSON.stringify({
                 "crypto_currencies": assets.list.map(asset => {
@@ -101,37 +118,19 @@ const CryptoComponent = (props) => {
             }
         };
 
-        fetchPrices().then(() => {
+        const fetchData = async () => {
+            await Promise.allSettled([fetchPrices(), fetchTotalByPortfolio()]);
+        };
+
+        fetchData().then(() => {
             setIsLoading(false);
         }).catch(console.error);
-        const intervalId = setInterval(fetchPrices, 5000);
+        const intervalId = setInterval(fetchData, 5000);
 
         return () => {
             clearInterval(intervalId);
         };
-    }, [assets.list, props.accessToken]);
-    useEffect(() => {
-        if (!portfolioData.portfolio) return;
-        if (!isLoading) return;
-        const fetchTotalByPortfolio = async () => {
-            const queryParams = new URLSearchParams({
-                "portfolio_id": portfolioData.portfolio.value.id
-            });
-            const totalResponse = await sendAPIRequest(props.accessToken, "/cryptoportfolio/totalPrice",
-                "GET", queryParams);
-            setPortfolioData(prevState => ({
-                portfolio: prevState.portfolio,
-                total: totalResponse["total"] || 0
-            }));
-        };
-        fetchTotalByPortfolio().catch(console.error);
-        const intervalId = setInterval(fetchTotalByPortfolio, 5000);
-
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [isLoading, portfolioData.portfolio, props.accessToken]);
-
+    }, [portfolioData.portfolio, assets.list, props.accessToken]);
 
     const portfoliosOptions = portfolios.map(portfolio => {
         return {label: portfolio["title"], value: portfolio, type: "portfolio"};
@@ -153,6 +152,7 @@ const CryptoComponent = (props) => {
         }));
     };
     const onCreatePortfolio = async (title) => {
+        if (title.length < 3) return alert("Portfolio title can be from 3 to 25 characters");
         const body = JSON.stringify({
             "title": title
         });
@@ -162,7 +162,8 @@ const CryptoComponent = (props) => {
         const portfolioTitle = newPortfolio["title"];
         setPortfolioData(prevState => ({
             portfolio: {label: portfolioTitle, value: newPortfolio, type: "portfolio"},
-            total: prevState.total
+            total: prevState.total,
+            totalsBuy: prevState.totalsBuy
         }));
         setInput(prevState => ({
             ...prevState,
@@ -183,7 +184,7 @@ const CryptoComponent = (props) => {
                     <Badge className="ms-1 small" bg="secondary">{code}</Badge>
                 </td>
                 <td className="text-center">{price === undefined ? "-" : `${price} $`}</td>
-                <td className="text-end">{price === undefined ? "-" : `${(amount * price).toFixed(2)} $`}</td>
+                <td className="text-end">{price === undefined ? "-" : `${parseFloat((amount * price).toFixed(8))} $`}</td>
             </tr>
         );
     });
@@ -285,7 +286,8 @@ const CryptoComponent = (props) => {
                 const portfolioTitle = portfolio["title"];
                 setPortfolioData({
                     total: portfolioData.total,
-                    portfolio: {label: portfolioTitle, value: portfolio, type: "portfolio"}
+                    portfolio: {label: portfolioTitle, value: portfolio, type: "portfolio"},
+                    totalsBuy: portfolioData.totalsBuy
                 });
                 setInput({...input, portfolioTitle: portfolioTitle});
                 setIsLoading(true);
@@ -294,12 +296,54 @@ const CryptoComponent = (props) => {
         }).catch(console.error);
     };
 
+    const [showDeletePortfolio, setShowDeletePortfolio] = useState(false);
+    const showDeletePortfolioModal = () => setShowDeletePortfolio(true);
+    const hideDeletePortfolioModal = () => setShowDeletePortfolio(false);
+
+    const onDeletePortfolio = async () => {
+        const response = await sendAPIRequest(props.accessToken,
+            `/cryptoportfolio/${portfolioData.portfolio.value.id}`, 'DELETE');
+        if (response.detail === 'OK') {
+            if (portfolios.length > 1) {
+                let portfolio = portfolios[0];
+                if (portfolio.id === portfolioData.portfolio.value.id)
+                    portfolio = portfolios[1];
+
+                setPortfolioData({
+                    total: portfolioData.total,
+                    portfolio: {label: portfolio["title"], value: portfolio, type: "portfolio"},
+                    totalsBuy: portfolioData.totalsBuy
+                });
+                setInput({...input, portfolioTitle: portfolio["title"]});
+            } else {
+                setPortfolioData({
+                    total: 0,
+                    portfolio: null,
+                    totalsBuy: []
+                });
+                setAssets({list: [], prices: {}});
+                setInput({...input, portfolioTitle: ""});
+                setTimeout(() => setIsLoading(false), 1000);
+            }
+            setIsLoading(true);
+        }
+        hideDeletePortfolioModal();
+        hideEditPortfolioModal();
+    };
+
+
+    let totalProfit = 0;
+    portfolioData.totalsBuy.forEach(totalBuy => {
+        const currency_price = assets.prices[totalBuy["currency_code"]] || 0;
+        totalProfit += currency_price > 0 ? currency_price * totalBuy["total_amount"] - totalBuy["total_price"] : 0;
+    });
+    const totalProfitRounded = Math.abs(totalProfit).toFixed(2);
 
     return (
         <Container className="table-response">
             <Row className="mt-4 text-center">
-                <Col sm={4} className="mt-2">
-                    <CreatableSelect className="my-select-container text-start"
+                <Col sm={6} className="mt-2 text-center">
+                    <CreatableSelect className="my-select-container portfolio-select text-start"
                                      classNamePrefix="my-select" placeholder="Portfolio"
                                      value={portfolioData.portfolio}
                                      options={portfoliosOptions}
@@ -312,13 +356,8 @@ const CryptoComponent = (props) => {
                                      }}
                     />
                 </Col>
-                <Col sm={4} className="mt-3 align-content-center">
-                    <h5>Balance: <span
-                        style={{fontVariantNumeric: 'tabular-nums'}}>{portfolioData.total.toFixed(2)}</span> $
-                    </h5>
-                </Col>
-                <Col sm={4} className="mt-2">
-                    <ButtonGroup className="ms-2">
+                <Col sm={6} className="mt-2 text-end">
+                    <ButtonGroup className="buttons-portfolio mt-1">
                         <Button onClick={showEditPortfolioModal} className="text-white fw-bold" size="sm"
                                 variant="outline-secondary" active={showEditPortfolio}>Edit</Button>
                         <Button className="text-white fw-bold" variant="outline-secondary" size="sm"
@@ -326,10 +365,31 @@ const CryptoComponent = (props) => {
                     </ButtonGroup>
                 </Col>
             </Row>
+            <Container>
+                <div className="mt-3 d-flex justify-content-start">
+                    <small className="muted">Current balance</small>
+                </div>
+                <div className="d-flex justify-content-start">
+                    <h3 style={{fontVariantNumeric: 'tabular-nums'}}>{portfolioData.total.toFixed(2)} $</h3>
+                </div>
+                <Stack className="mt-1" direction="horizontal" gap={1}>
+                    <div>
+                        <div className="d-flex justify-content-between">
+                            <small className="muted">Total profit/loss</small>
+                        </div>
+                        <div className="mt-1 d-flex justify-content-between">
+                            <h6 className="number-font"
+                                style={{color: totalProfit > 0 ? "var(--amount-positive)" : totalProfitRounded === "0.00" ? "" : "var(--amount-negative)"}}>
+                                {totalProfit > 0 ? "+" : totalProfitRounded === "0.00" ? "" : "-"}
+                                {totalProfitRounded} $</h6>
+                        </div>
+                    </div>
+                </Stack>
+            </Container>
             {(isLoading) ? (
                 <InfinitySpinContainer marginTop="8rem"/>
             ) : (
-                <Table responsive hover className="mt-5" variant="dark">
+                <Table responsive hover className="mt-4" variant="dark">
                     <thead>
                     <tr className="table-text crypto-transaction-row">
                         <td className="text-start">Asset</td>
@@ -372,6 +432,12 @@ const CryptoComponent = (props) => {
                         </Form.Group>
                     </Modal.Body>
                     <Modal.Footer>
+                        <Button
+                            onClick={showDeletePortfolioModal}
+                            className="bg-gradient"
+                            variant="danger">
+                            Delete
+                        </Button>
                         <Button type="submit"
                                 className="bg-gradient"
                                 variant="primary">
@@ -379,6 +445,23 @@ const CryptoComponent = (props) => {
                         </Button>
                     </Modal.Footer>
                 </Form>
+            </Modal>
+            <Modal centered show={showDeletePortfolio} onHide={hideDeletePortfolioModal}
+                   style={{background: "rgba(0, 0, 0, 0.5)"}}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete crypto transaction</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete crypto transaction?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={onDeletePortfolio}>
+                        Yes, delete
+                    </Button>
+                    <Button variant="danger" onClick={hideDeletePortfolioModal}>
+                        No, back
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </Container>
     );
