@@ -165,7 +165,7 @@ const Header = (props) => {
                 <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
                     <Container>
                         <LinkContainer to="/">
-                            <Navbar.Brand>CashFlowMate</Navbar.Brand>
+                            <Navbar.Brand>DSCashMate</Navbar.Brand>
                         </LinkContainer>
                         <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                         <Navbar.Collapse id="responsive-navbar-nav">
