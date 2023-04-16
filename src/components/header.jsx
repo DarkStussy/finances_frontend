@@ -23,7 +23,11 @@ const Header = (props) => {
             return;
         const getUsername = async () => {
             const user = await getUser(props.accessToken);
-            setUser({username: user['username']});
+            if (user.detail) {
+                props.setAccessToken(null);
+            } else {
+                setUser({username: user['username']});
+            }
         };
 
         getUsername().catch(console.error);
