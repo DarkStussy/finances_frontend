@@ -21,6 +21,7 @@ import Categories from "./pages/categories";
 import FiatStats from "./pages/fiat_stats";
 import Crypto from "./pages/crypto";
 import CryptoAsset from "./pages/crypto_asset";
+import PageNotFound from "./pages/404";
 
 
 export const apiUrl = process.env.REACT_APP_API_URL;
@@ -75,6 +76,9 @@ const App = () => {
                            element={<Crypto accessToken={accessToken} setAccessToken={setAccessToken}/>}/>
                     <Route path={'/cryptoAsset'}
                            element={<CryptoAsset accessToken={accessToken} setAccessToken={setAccessToken}/>}/>
+
+                    {/*  not found  */}
+                    <Route path="*" element={<PageNotFound/>}/>
                 </Routes>
             </main>
             <Footer/>
