@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 const Main = () => {
     return (
         <Container id="main" className="p-2">
-            <h1 className="text-center mb-5">Welcome to !</h1>
+            <h1 className="text-center mb-5">Welcome to DSCashMate!</h1>
             <Row>
                 <Col>
                     <p>Our application will help you easily track your finances, manage your budget, and control your

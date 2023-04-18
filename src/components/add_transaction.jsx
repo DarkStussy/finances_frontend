@@ -64,7 +64,11 @@ const AddTransactionComponent = (props) => {
     const navigate = useNavigate();
     const onClickBack = e => {
         e.preventDefault();
-        navigate('/transactions');
+        if (asset) {
+            navigate('/asset', {state: {assetID: asset.value.id}})
+        } else {
+            navigate('/transactions')
+        }
     };
     const setShow = (status) => {
         setShowAlert(prevState => ({msg: prevState.msg, show: status}));

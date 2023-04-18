@@ -101,7 +101,7 @@ const ChangeTransactionComponent = (props) => {
                 }
             } else {
                 if (props.fromAsset)
-                    navigate('/asset', {state: {assetID: input.asset.value.id}})
+                    navigate('/asset', {state: {assetID: asset.value.id}})
                 else
                     navigate('/transactions')
             }
@@ -118,6 +118,11 @@ const ChangeTransactionComponent = (props) => {
         setShowDeleteModal(false);
         deleteTransaction(props.accessToken, props.transaction.id).catch(console.error);
         navigate('/transactions');
+        if (props.fromAsset) {
+            navigate('/asset', {state: {assetID: asset.value.id}})
+        } else {
+            navigate('/transactions')
+        }
     };
     const deleteButton = (
         <>
@@ -146,7 +151,7 @@ const ChangeTransactionComponent = (props) => {
 
     const onClickBack = () => {
         if (props.fromAsset)
-            navigate('/asset', {state: {assetID: input.asset.value.id}})
+            navigate('/asset', {state: {assetID: asset.value.id}})
         else
             navigate('/transactions');
     }
