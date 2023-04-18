@@ -64,8 +64,8 @@ const AssetComponent = (props) => {
                 "var(--amount-negative)";
             return <tr key={transactionID} className="table-text crypto-transaction-row clickable-row"
                        onClick={() => navigate('/changeTransaction', {state: {transaction, fromAsset: true}})}>
+                <td>{transaction["asset"]["title"]}</td>
                 <td>{transaction["category"]["title"]}</td>
-                <td></td>
                 <td></td>
                 <td style={{color: amountColor}}>{transaction["amount"].toFixed(2)} {currencyCode}</td>
             </tr>
